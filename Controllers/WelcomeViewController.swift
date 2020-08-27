@@ -1,5 +1,5 @@
 //
-//  HomeViewController.swift
+//  WelcomeViewController.swift
 //  Repertoire
 //
 //  Created by Utkucan Türkan on 27.08.2020.
@@ -8,17 +8,12 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
-    
+class WelcomeViewController: UIViewController {
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        setFirstEntry(false)
-        self.title = "Home"
-    }
-    
-    private func setFirstEntry(_ state: Bool) {
-        UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
-        print("[INFO] - \(AppConstraints.firstEntryKey) is set \(state.description)")
+
+        // Do any additional setup after loading the view.
     }
 
     /*

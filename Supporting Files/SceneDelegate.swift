@@ -25,10 +25,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let initialViewControllerStoryBoardId = UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) == nil ? AppConstraints.welcomeViewControllerStoryboardId : AppConstraints.homeViewControllerStoryboardId
         
         let initialViewControler = storyboard.instantiateViewController(withIdentifier: initialViewControllerStoryBoardId)
-        
-        let navigationController = UINavigationController(rootViewController: initialViewControler)
-        
-        window.rootViewController = navigationController
+                
+        window.rootViewController = initialViewControler
         
         self.window = window
         

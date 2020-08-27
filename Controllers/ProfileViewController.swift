@@ -1,5 +1,5 @@
 //
-//  WelcomeViewController.swift
+//  ProfileViewController.swift
 //  Repertoire
 //
 //  Created by Utkucan Türkan on 27.08.2020.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class WelcomeViewController: UIViewController {
+class ProfileViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,16 +16,7 @@ class WelcomeViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-        
+
     /*
     // MARK: - Navigation
 
