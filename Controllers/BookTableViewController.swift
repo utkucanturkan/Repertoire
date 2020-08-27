@@ -12,13 +12,19 @@ class BookTableViewController: UITableViewController {
 
     private func setFirstEntry(_ state: Bool) {
         UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
-        print("[INFO] - \(AppConstraints.firstEntryKey) is set \(state.description)")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.navigationController?.setNavigationBarHidden(true, animated: true)
+        self.tabBarController?.navigationController?.navigationItem.setHidesBackButton(true, animated: true)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setFirstEntry(false)
         self.title = "Books"
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -30,7 +36,7 @@ class BookTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
