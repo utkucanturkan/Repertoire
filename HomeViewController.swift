@@ -13,6 +13,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setFirstEntry(false)
+        self.title = "Home"
     }
     
     private func setFirstEntry(_ state: Bool) {

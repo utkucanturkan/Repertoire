@@ -20,9 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        
-        let initialViewControllerStoryBoardId = UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) != nil ? AppConstraints.homeViewControllerStoryboardId : AppConstraints.welcomeViewControllerStoryboardId
+        let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
+
+        let initialViewControllerStoryBoardId = UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) == nil ? AppConstraints.welcomeViewControllerStoryboardId : AppConstraints.homeViewControllerStoryboardId
         
         let initialViewControler = storyboard.instantiateViewController(withIdentifier: initialViewControllerStoryBoardId)
         

@@ -9,6 +9,7 @@
 import Foundation
 
 struct AppConstraints {
+    static let storyboardName = "Main"
     static let welcomeViewControllerStoryboardId = "WelcomeViewController"
     static let homeViewControllerStoryboardId = "HomeViewController"
     static let firstEntryKey = "isFirstEntry"
