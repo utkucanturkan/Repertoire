@@ -12,6 +12,12 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setFirstEntry(false)
+    }
+    
+    private func setFirstEntry(_ state: Bool) {
+        UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
+        print("[INFO] - \(AppConstraints.firstEntryKey) is set \(state.description)")
     }
 
     /*
