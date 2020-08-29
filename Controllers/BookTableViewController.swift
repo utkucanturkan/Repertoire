@@ -7,9 +7,10 @@
 //
 
 import UIKit
+import SQLite
 
 class BookTableViewController: UITableViewController {
-
+    
     private func setFirstEntry(_ state: Bool) {
         UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
     }
@@ -20,11 +21,85 @@ class BookTableViewController: UITableViewController {
         self.tabBarController?.navigationController?.navigationItem.setHidesBackButton(true, animated: true)
     }
     
+    var isMemberShipDone = false {
+        didSet {
+            if isMemberShipDone {
+                createDatabase()
+            }
+        }
+    }
+    
+    private func createDatabase() {
+        let db = try? Connection("\(AppConstraints.databasePath)/db.sqlite3")
+        
+        // default expressions
+        let created = Expression<Date>("created")
+        let updated = Expression<Date?>("updated")
+        let status = Expression<Bool>("status")
+        
+        let users = Table("users")
+        let userId = Expression<Int64>("id")
+        let userName = Expression<String>("userName")
+        
+        try? db?.run(users.create(ifNotExists: true) { t in
+            t.column(userId, primaryKey: .autoincrement)
+            t.column(userName)
+            t.column(created, defaultValue: Date())
+            t.column(updated)
+            t.column(status, defaultValue: true)
+        })
+        
+        let books = Table("books")
+        let bookId = Expression<Int64>("id")
+        let bookName = Expression<String>("name")
+        let bookUserId = Expression<Int64>("user_Id")
+        
+        try? db?.run(books.create(ifNotExists: true) { t in
+            t.column(bookId, primaryKey: .autoincrement)
+            t.column(bookName, unique: true)
+            t.column(created, defaultValue: Date())
+            t.column(updated)
+            t.column(status, defaultValue: true)
+            t.column(userId)
+            t.foreignKey(bookUserId, references: users, userId, delete: .cascade)
+        })
+        
+        
+        // Songs
+        let songs = Table("songs")
+        let songId = Expression<Int64>("id")
+        let songName = Expression<String>("name")
+        let songContent = Expression<String>("content")
+        let mediaUrl = Expression<String?>("mediaUrl")
+        
+        try? db?.run(songs.create(ifNotExists: true) { t in
+            t.column(songId, primaryKey: .autoincrement)
+            t.column(songName, unique: true)
+            t.column(songContent)
+            t.column(mediaUrl)
+            t.column(created, defaultValue: Date())
+            t.column(updated)
+            t.column(status, defaultValue: true)
+        })
+        
+        
+        //BookSong
+        let bookSong = Table("bookSong")
+        let bookSongId = Expression<Int64>("id")
+        let bookFK = Expression<Int64>("bookId")
+        let songFK = Expression<Int64>("songId")
+        
+        try? db?.run(bookSong.create(ifNotExists: true){ t in
+            t.column(bookSongId, primaryKey: .autoincrement)
+            t.column(bookFK)
+            t.column(songFK)
+        })
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setFirstEntry(false)
         self.title = "Books"
-        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
