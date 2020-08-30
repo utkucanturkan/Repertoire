@@ -10,12 +10,27 @@ import Foundation
 import SQLite
 
 struct SongRepository: RepositoryProtocol {
+    var updateExpression: Update {
+        return table.filter(id == model.id).update(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
+    }
+    
+    var deleteExpression: Delete {
+        return table.filter(id == model.id).delete()
+    }
+    
+
+    typealias Entity = Song
+    
+    // Expressions
+    let name = Expression<String>("name")
+    let content = Expression<String>("content")
+    let mediaUrl = Expression<String?>("mediaUrl")
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
-            t.column(songId, primaryKey: .autoincrement)
-            t.column(songName, unique: true)
-            t.column(songContent)
+            t.column(id, primaryKey: .autoincrement)
+            t.column(name, unique: true)
+            t.column(content)
             t.column(mediaUrl)
             t.column(created, defaultValue: Date())
             t.column(updated)
@@ -28,33 +43,12 @@ struct SongRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(songName <- model.name, songContent <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
+        return table.insert(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
     }
     
     var model: Song
-    
-    init(song: Song) {
-        model = song
-    }
-    
-    // Expressions
-    let songId = Expression<Int64>("id")
-    let songName = Expression<String>("name")
-    let songContent = Expression<String>("content")
-    let mediaUrl = Expression<String?>("mediaUrl")
-    let created = Expression<Date>("created")
-    let updated = Expression<Date?>("updated")
-    let status = Expression<Bool>("status")
 
-    func delete(item: Song) throws {
-        
-    }
-    
     func findAll() throws -> [Song]? {
         return nil
     }
-    
-    typealias Entity = Song
-    
-    
 }

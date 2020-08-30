@@ -21,8 +21,6 @@ class BookTableViewController: UITableViewController {
         self.tabBarController?.navigationController?.navigationItem.setHidesBackButton(true, animated: true)
     }
     
-    //let bookRepository = BookRepository()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setFirstEntry(false)

@@ -10,10 +10,9 @@ import Foundation
 import SQLite
 
 struct Song: EntityProtocol {
-
+    var id: Int64
     var name: String
     var content: String
     var mediaUrl: String
     var status: Bool
-    
 }

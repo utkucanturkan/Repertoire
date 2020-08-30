@@ -10,20 +10,24 @@ import Foundation
 import SQLite
 
 struct UserRepository: RepositoryProtocol {
+    var updateExpression: Update {
+        return table.filter(id == model.id).update(userName <- model.userName, status <- model.status)
+    }
     
-    // Query
-    let users = Table("users")
+    var deleteExpression: Delete {
+        return table.filter(id == model.id).delete()
+    }
+    
+    var model: User
+
+    typealias Entity = User
     
     // Expressions
-    let created = Expression<Date>("created")
-    let updated = Expression<Date?>("updated")
-    let status = Expression<Bool>("status")
-    let userId = Expression<Int64>("id")
     let userName = Expression<String>("userName")
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
-            t.column(userId, primaryKey: .autoincrement)
+            t.column(id, primaryKey: .autoincrement)
             t.column(userName)
             t.column(created, defaultValue: Date())
             t.column(updated)
@@ -36,20 +40,10 @@ struct UserRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert()
+        return table.insert(userName <- model.userName, status <- model.status)
     }
-    
-    func createTable() throws {
-        
-    }
-    
-    func delete(item: User) throws {
-        
-    }
-    
+
     func findAll() throws -> [User]? {
         return nil
     }
-    
-    typealias Entity = User
 }

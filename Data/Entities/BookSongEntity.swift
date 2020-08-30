@@ -9,8 +9,10 @@
 import Foundation
 import SQLite
 
-struct BookSong:EntityProtocol {
+struct BookSong: EntityProtocol {
+    var id: Int64
     
+
     // Queries
     let bookSong = Table("bookSong")
     

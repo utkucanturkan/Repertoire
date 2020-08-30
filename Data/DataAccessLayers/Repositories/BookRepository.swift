@@ -10,6 +10,25 @@ import Foundation
 import SQLite
 
 struct BookRepository: RepositoryProtocol {
+    var updateExpression: Update {
+        return table.filter(id == model.id).update(name <- model.name, status <- model.status)
+    }
+    
+
+    var deleteExpression: Delete {
+        return table.filter(id == model.id).delete()
+    }
+
+    typealias Entity = Book
+    
+    // Expressions
+    let name = Expression<String>("name")
+    let userFK = Expression<Int64>("user_Id")
+    
+    // References
+    let users = Table("users")
+    let userId = Expression<Int64>("id")
+    
     var tableName: String {
         return "books"
     }
@@ -27,35 +46,13 @@ struct BookRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(name <- model.name)
+        return table.insert(name <- model.name, userFK <- model.userId, status <- model.status)
     }
-    
-    
+
     var model: Book
     
-    init(book: Book) {
-        model = book
-    }
-    
-    // Expressions
-    let id = Expression<Int64>("id")
-    let name = Expression<String>("name")
-    let userFK = Expression<Int64>("user_Id")
-    let created = Expression<Date>("created")
-    let updated = Expression<Date?>("updated")
-    let status = Expression<Bool>("status")
-    
-    // References
-    let users = Table("users")
-    let userId = Expression<Int64>("id")
-            
-    func delete(item: Book) throws {
-        
-    }
     
     func findAll() throws -> [Book]? {
         return nil
     }
-    
-    typealias Entity = Book
 }

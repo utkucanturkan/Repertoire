@@ -13,6 +13,7 @@ enum DataAccessError: Error {
     case Datastore_Connection_Error
     case Insert_Error
     case Delete_Error
+    case Update_Error
     case Search_Error
     case Nil_In_Data
 }
@@ -32,28 +33,7 @@ struct SQLiteDataAccessLayer {
         }
     }
     
-    func insert(insertExpression: Insert) throws -> Int64 {
-        guard let database = db else {
-            throw DataAccessError.Datastore_Connection_Error
-        }
-        
-        do {
-            let rowId = try database.run(insertExpression)
-            
-            guard rowId > 0 else {
-                throw DataAccessError.Insert_Error
-            }
-            
-            return rowId
-        } catch _ {
-            throw DataAccessError.Insert_Error
-        }
-    }
-    
-    
-    
     func createTable(createTableExpression: String) throws {
-        
         guard let database = db else {
             throw DataAccessError.Datastore_Connection_Error
         }
@@ -63,7 +43,50 @@ struct SQLiteDataAccessLayer {
         } catch _ {
             // thrown an error if table already exists
         }
-        
     }
-     
+    
+    // CRUD
+    
+    func insert(insertExpression: Insert) throws -> Int64 {
+        guard let database = db else {
+            throw DataAccessError.Datastore_Connection_Error
+        }
+        do {
+            let rowId = try database.run(insertExpression)
+            guard rowId > 0 else {
+                throw DataAccessError.Insert_Error
+            }
+            return rowId
+        } catch _ {
+            throw DataAccessError.Insert_Error
+        }
+    }
+    
+    func update(entity: EntityProtocol, updateExpression: Update) throws {
+        guard let database = db else {
+            throw DataAccessError.Datastore_Connection_Error
+        }
+        do {
+            let tmp = try database.run(updateExpression)
+            guard tmp > 0 else {
+                throw DataAccessError.Update_Error
+            }
+        } catch _ {
+            throw DataAccessError.Update_Error
+        }
+    }
+    
+    func delete(entity: EntityProtocol, deleteExpression: Delete) throws {
+        guard let database = db else {
+            throw DataAccessError.Datastore_Connection_Error
+        }
+        do {
+            let tmp = try database.run(deleteExpression)
+            guard tmp > 0 else {
+                throw DataAccessError.Delete_Error
+            }
+        } catch _ {
+            throw DataAccessError.Delete_Error
+        }
+    }
 }

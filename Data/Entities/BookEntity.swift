@@ -9,9 +9,8 @@
 import Foundation
 
 struct Book: EntityProtocol {
-    
+    var id: Int64
     var name: String
     var userId: Int64
     var status: Bool
-    
 }
