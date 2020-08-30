@@ -10,20 +10,16 @@ import Foundation
 import SQLite
 
 struct UserRepository: RepositoryProtocol {
-    var updateExpression: Update {
-        return table.filter(id == model.id).update(userName <- model.userName, status <- model.status)
-    }
-    
-    var deleteExpression: Delete {
-        return table.filter(id == model.id).delete()
-    }
+    typealias Entity = User
     
     var model: User
-
-    typealias Entity = User
     
     // Expressions
     let userName = Expression<String>("userName")
+    
+    var tableName: String {
+        return "users"
+    }
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
@@ -34,16 +30,16 @@ struct UserRepository: RepositoryProtocol {
             t.column(status, defaultValue: true)
         }
     }
-    
-    var tableName: String {
-        return "users"
-    }
-    
+
     var insertExpression: Insert {
         return table.insert(userName <- model.userName, status <- model.status)
     }
-
-    func findAll() throws -> [User]? {
-        return nil
+    
+    var updateExpression: Update {
+        return table.filter(id == model.id).update(userName <- model.userName, status <- model.status)
+    }
+    
+    var deleteExpression: Delete {
+        return table.filter(id == model.id).delete()
     }
 }

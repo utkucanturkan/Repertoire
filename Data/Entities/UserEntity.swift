@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SQLite
 
 struct User: EntityProtocol {
     var id: Int64

@@ -21,8 +21,6 @@ protocol RepositoryProtocol {
     var tableName: String { get }
     
     var model: Entity { get set }
-    
-    func findAll() throws -> [Entity]?
 }
 
 
@@ -39,12 +37,13 @@ extension RepositoryProtocol {
         return Table(tableName)
     }
     
-    func insert(item: Entity) throws -> Int64 {
-        return try SQLiteDataAccessLayer.shared.insert(insertExpression: insertExpression)
-    }
-    
     func createTable() throws {
         try SQLiteDataAccessLayer.shared.createTable(createTableExpression: createTableExpression)
+    }
+    
+    // CRUD
+    func insert(item: Entity) throws -> Int64 {
+        return try SQLiteDataAccessLayer.shared.insert(insertExpression: insertExpression)
     }
     
     func delete(item: Entity) throws {

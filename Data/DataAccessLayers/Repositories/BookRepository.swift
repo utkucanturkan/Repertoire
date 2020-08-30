@@ -10,16 +10,9 @@ import Foundation
 import SQLite
 
 struct BookRepository: RepositoryProtocol {
-    var updateExpression: Update {
-        return table.filter(id == model.id).update(name <- model.name, status <- model.status)
-    }
-    
-
-    var deleteExpression: Delete {
-        return table.filter(id == model.id).delete()
-    }
-
     typealias Entity = Book
+    
+    var model: Book
     
     // Expressions
     let name = Expression<String>("name")
@@ -49,10 +42,11 @@ struct BookRepository: RepositoryProtocol {
         return table.insert(name <- model.name, userFK <- model.userId, status <- model.status)
     }
 
-    var model: Book
+    var updateExpression: Update {
+        return table.filter(id == model.id).update(name <- model.name, status <- model.status)
+    }
     
-    
-    func findAll() throws -> [Book]? {
-        return nil
+    var deleteExpression: Delete {
+        return table.filter(id == model.id).delete()
     }
 }

@@ -10,21 +10,18 @@ import Foundation
 import SQLite
 
 struct SongRepository: RepositoryProtocol {
-    var updateExpression: Update {
-        return table.filter(id == model.id).update(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
-    }
-    
-    var deleteExpression: Delete {
-        return table.filter(id == model.id).delete()
-    }
-    
-
     typealias Entity = Song
+    
+    var model: Song
     
     // Expressions
     let name = Expression<String>("name")
     let content = Expression<String>("content")
     let mediaUrl = Expression<String?>("mediaUrl")
+    
+    var tableName: String {
+        return "songs"
+    }
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
@@ -38,17 +35,15 @@ struct SongRepository: RepositoryProtocol {
         }
     }
     
-    var tableName: String {
-        return "songs"
-    }
-    
     var insertExpression: Insert {
         return table.insert(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
     }
     
-    var model: Song
-
-    func findAll() throws -> [Song]? {
-        return nil
+    var updateExpression: Update {
+        return table.filter(id == model.id).update(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
+    }
+    
+    var deleteExpression: Delete {
+        return table.filter(id == model.id).delete()
     }
 }

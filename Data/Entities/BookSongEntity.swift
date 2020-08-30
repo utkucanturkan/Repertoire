@@ -11,34 +11,6 @@ import SQLite
 
 struct BookSong: EntityProtocol {
     var id: Int64
-    
-
-    // Queries
-    let bookSong = Table("bookSong")
-    
-    // Expressions
-    let bookSongId = Expression<Int64>("id")
-    let bookFK = Expression<Int64>("bookId")
-    let songFK = Expression<Int64>("songId")
-    
-    // References
-    let books = Table("books")
-    let bookId = Expression<Int64>("id")
-    
-    let songs = Table("songs")
-    let songId = Expression<Int64>("id")
-    
-    func createTable(connection: Connection) {
-        do {
-            try connection.run(bookSong.create(ifNotExists: true) { t in
-                t.column(bookSongId, primaryKey: .autoincrement)
-                t.column(bookFK)
-                t.column(songFK)
-                t.foreignKey(bookFK, references: books, bookId, delete: .cascade)
-                t.foreignKey(songFK, references: songs, songId, delete: .cascade)
-            })
-        } catch {
-            
-        }
-    }
+    var bookId: Int64
+    var songId: Int64
 }
