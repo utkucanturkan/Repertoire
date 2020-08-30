@@ -10,5 +10,6 @@ import Foundation
 
 struct BookViewModel {
     var name: String
-    
+    var createdDate: Date
+    var songCount: Int
 }

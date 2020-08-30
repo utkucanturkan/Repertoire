@@ -14,4 +14,5 @@ struct AppConstraints {
     static let homeViewControllerStoryboardId = "HomeViewController"
     static let firstEntryKey = "isFirstEntry"
     static let databasePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+    static let bookCellIdentifier = "bookCell"
 }

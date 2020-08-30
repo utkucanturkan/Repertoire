@@ -9,9 +9,24 @@
 import UIKit
 
 class BookTableViewCell: UITableViewCell {
-
     
-    let book: BookViewModel? = nil
+    var model: BookViewModel? {
+        didSet {
+            updateCell()
+        }
+    }
+    
+    @IBOutlet weak var name: UILabel!
+    @IBOutlet weak var songCount: UILabel!
+    @IBOutlet weak var createdDate: UILabel!
+    
+    private func updateCell() {
+        if let book = model {
+            name?.text = book.name
+            songCount?.text = "\(book.songCount)"
+            createdDate?.text = book.createdDate.description
+        }
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
