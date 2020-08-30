@@ -10,10 +10,10 @@ import Foundation
 import SQLite
 
 struct UserRepository: RepositoryProtocol {
+    var model: User?
+    
     typealias Entity = User
-    
-    var model: User
-    
+        
     // Expressions
     let userName = Expression<String>("userName")
     
@@ -32,14 +32,14 @@ struct UserRepository: RepositoryProtocol {
     }
 
     var insertExpression: Insert {
-        return table.insert(userName <- model.userName, status <- model.status)
+        return table.insert(userName <- model!.userName, status <- model!.status)
     }
     
     var updateExpression: Update {
-        return table.filter(id == model.id).update(userName <- model.userName, status <- model.status)
+        return table.filter(id == model!.id).update(userName <- model!.userName, status <- model!.status)
     }
     
     var deleteExpression: Delete {
-        return table.filter(id == model.id).delete()
+        return table.filter(id == model!.id).delete()
     }
 }

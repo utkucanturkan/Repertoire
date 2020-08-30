@@ -10,9 +10,9 @@ import Foundation
 import SQLite
 
 struct BookRepository: RepositoryProtocol {
-    typealias Entity = Book
+    var model: Book?
     
-    var model: Book
+    typealias Entity = Book
     
     // Expressions
     let name = Expression<String>("name")
@@ -39,14 +39,27 @@ struct BookRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(name <- model.name, userFK <- model.userId, status <- model.status)
+        return table.insert(name <- model!.name, userFK <- model!.userId, status <- model!.status)
     }
 
     var updateExpression: Update {
-        return table.filter(id == model.id).update(name <- model.name, status <- model.status)
+        return table.filter(id == model!.id).update(name <- model!.name, status <- model!.status)
+    }
+ 
+    var deleteExpression: Delete {
+        return table.filter(id == model!.id).delete()
     }
     
-    var deleteExpression: Delete {
-        return table.filter(id == model.id).delete()
+    
+    func getAllBy(userId id: Int64) throws -> [BookViewModel]? {
+        var result: [BookViewModel]?
+        
+        guard let database = SQLiteDataAccessLayer.shared.db else { throw DataAccessError.Datastore_Connection_Error }
+        
+        for row in try database.prepare(table.filter(userId == id).filter(status == true).order(created)) {
+            result?.append(BookViewModel(name: row[name]))
+        }
+        
+        return result
     }
 }

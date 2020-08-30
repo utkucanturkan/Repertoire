@@ -12,7 +12,7 @@ import SQLite
 struct BookSongRepository: RepositoryProtocol {
     typealias Entity = BookSong
     
-    var model: BookSong
+    var model: BookSong?
     
     // Expressions
     let bookFK = Expression<Int64>("bookId")
@@ -40,10 +40,14 @@ struct BookSongRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(bookFK <- model.bookId, songFK <- model.songId)
+        return table.insert(bookFK <- model!.bookId, songFK <- model!.songId)
     }
             
-    var deleteExpression: Delete
+    var deleteExpression: Delete {
+        return table.filter(id == model!.id).delete()
+    }
     
-    var updateExpression: Update
+    var updateExpression: Update {
+        return table.filter(id == model!.id).update(bookFK <- model!.bookId, songFK <- model!.songId)
+    }    
 }

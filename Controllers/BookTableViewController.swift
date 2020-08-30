@@ -20,15 +20,22 @@ class BookTableViewController: UITableViewController {
         self.tabBarController?.navigationController?.setNavigationBarHidden(true, animated: true)
         self.tabBarController?.navigationController?.navigationItem.setHidesBackButton(true, animated: true)
     }
+        
+    let bookRepository = BookRepository()
+    
+    var books: [BookViewModel]? {
+        didSet {
+            tableView?.reloadData()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setFirstEntry(false)
         self.title = "Books"
         
-        //let book = Book(name: "", userId: 1, status: true)
+        books = try? bookRepository.getAllBy(userId: 1)
         
-       // try? bookRepository.insert(item: book)
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -46,7 +53,7 @@ class BookTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return books?.count ?? 0
     }
 
     /*

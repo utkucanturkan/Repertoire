@@ -10,10 +10,10 @@ import Foundation
 import SQLite
 
 struct SongRepository: RepositoryProtocol {
+    var model: Song?
+    
     typealias Entity = Song
-    
-    var model: Song
-    
+        
     // Expressions
     let name = Expression<String>("name")
     let content = Expression<String>("content")
@@ -36,14 +36,14 @@ struct SongRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
+        return table.insert(name <- model!.name, content <- model!.content, mediaUrl <- model!.mediaUrl, status <- model!.status)
     }
     
     var updateExpression: Update {
-        return table.filter(id == model.id).update(name <- model.name, content <- model.content, mediaUrl <- model.mediaUrl, status <- model.status)
+        return table.filter(id == model!.id).update(name <- model!.name, content <- model!.content, mediaUrl <- model!.mediaUrl, status <- model!.status)
     }
     
     var deleteExpression: Delete {
-        return table.filter(id == model.id).delete()
+        return table.filter(id == model!.id).delete()
     }
 }

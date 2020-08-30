@@ -20,7 +20,7 @@ protocol RepositoryProtocol {
     
     var tableName: String { get }
     
-    var model: Entity { get set }
+    var model: Entity? { get set }
 }
 
 
@@ -38,19 +38,22 @@ extension RepositoryProtocol {
     }
     
     func createTable() throws {
-        try SQLiteDataAccessLayer.shared.createTable(createTableExpression: createTableExpression)
+        try SQLiteDataAccessLayer.shared.createTable(expression: createTableExpression)
     }
     
     // CRUD
-    func insert(item: Entity) throws -> Int64 {
-        return try SQLiteDataAccessLayer.shared.insert(insertExpression: insertExpression)
+    mutating func insert(element: Entity) throws -> Int64 {
+        model = element
+        return try SQLiteDataAccessLayer.shared.insert(expression: insertExpression)
     }
     
-    func delete(item: Entity) throws {
-        try SQLiteDataAccessLayer.shared.delete(entity: item, deleteExpression: deleteExpression)
+    mutating func delete(element: Entity) throws {
+        model = element
+        try SQLiteDataAccessLayer.shared.delete(expression: deleteExpression)
     }
     
-    func update(item: Entity) throws {
-        try SQLiteDataAccessLayer.shared.update(entity: item, updateExpression: updateExpression)
+    mutating func update(element: Entity) throws {
+        model = element
+        try SQLiteDataAccessLayer.shared.update(expression: updateExpression)
     }
 }

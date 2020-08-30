@@ -1,5 +1,5 @@
 //
-//  BookSongEntity.swift
+//  BookViewModel.swift
 //  Repertoire
 //
 //  Created by Utkucan Türkan on 30.08.2020.
@@ -8,8 +8,7 @@
 
 import Foundation
 
-struct BookSong: EntityProtocol {
-    var id: Int64
-    var bookId: Int64
-    var songId: Int64
+struct BookViewModel {
+    var name: String
+    
 }
