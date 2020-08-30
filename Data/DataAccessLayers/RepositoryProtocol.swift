@@ -16,7 +16,6 @@ protocol RepositoryProtocol {
     var insertExpression: Insert { get }
     var tableName: String { get }
     
-    func createTable() throws -> Void
     func delete(item: Entity) throws -> Void
     func findAll() throws -> [Entity]?
 }
