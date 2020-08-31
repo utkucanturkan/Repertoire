@@ -34,7 +34,7 @@ class BookTableViewController: UITableViewController {
         setFirstEntry(false)
         self.title = "Books"
         
-        books = try? bookRepository.getAllBy(userId: 1)
+        //books = try? bookRepository.getAllBy(userId: 1)
         
         
         // Uncomment the following line to preserve selection between presentations
