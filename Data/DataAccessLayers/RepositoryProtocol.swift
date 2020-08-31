@@ -9,11 +9,19 @@
 import Foundation
 import SQLite
 
-protocol RepositoryProtocol {
-    associatedtype Entity: EntityProtocol
-    
+protocol Initializable {
     var createTableExpression: String { get }
-    
+}
+
+extension Initializable {
+    func createTable() throws {
+        try SQLiteDataAccessLayer.shared.createTable(expression: createTableExpression)
+    }
+}
+
+protocol RepositoryProtocol: Initializable {
+    associatedtype Entity: EntityProtocol
+
     var insertExpression: Insert { get }
     var deleteExpression: Delete { get }
     var updateExpression: Update { get }
@@ -22,7 +30,6 @@ protocol RepositoryProtocol {
     
     var model: Entity? { get set }
 }
-
 
 extension RepositoryProtocol {
     var id: Expression<Int64> { return Expression<Int64>("id") }
@@ -36,11 +43,7 @@ extension RepositoryProtocol {
     var table: Table {
         return Table(tableName)
     }
-    
-    func createTable() throws {
-        try SQLiteDataAccessLayer.shared.createTable(expression: createTableExpression)
-    }
-    
+
     // CRUD
     mutating func insert(element: Entity) throws -> Int64 {
         model = element

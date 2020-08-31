@@ -10,10 +10,22 @@ import UIKit
 
 class WelcomeViewController: UIViewController {
 
+    var isFirstEntry: Bool {
+        return UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) == nil
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
+
+        if isFirstEntry {
+            
+            // TODO: create local databases (SQLite)
+            let repositories: [Initializable] = [UserRepository(), BookRepository(), SongRepository(), BookSongRepository()]
+            
+            for repository in repositories {
+                try? repository.createTable()
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {

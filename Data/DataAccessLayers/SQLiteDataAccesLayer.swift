@@ -33,13 +33,6 @@ struct SQLiteDataAccessLayer {
         }
     }
     
-    /*
-    static func initializeDatabase(repositories: [RepositoryProtocol]) {
-        for repository in repositories {
-            repository.createTable()
-        }
-    }
-    */
     func createTable(expression: String) throws {
         guard let database = db else {
             throw DataAccessError.Datastore_Connection_Error
@@ -53,7 +46,6 @@ struct SQLiteDataAccessLayer {
     }
     
     // CRUD
-    
     func insert(expression: Insert) throws -> Int64 {
         guard let database = db else {
             throw DataAccessError.Datastore_Connection_Error
