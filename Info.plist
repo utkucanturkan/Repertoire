@@ -26,9 +26,21 @@
 				<string>com.googleusercontent.apps.787989659850-p6qbrmv5520f659ro46olpdp49crom73</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb304797064114509</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>FacebookAppID</key>
+	<string>304797064114509</string>
+	<key>FacebookDisplayName</key>
+	<string>Repetoire</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -71,18 +83,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <key>CFBundleURLTypes</key>
-    <array>
-      <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>fb304797064114509</string>
-      </array>
-      </dict>
-    </array>
-    <key>FacebookAppID</key>
-    <string>304797064114509</string>
-    <key>FacebookDisplayName</key>
-    <string>Repetoire</string>
 </dict>
 </plist>
