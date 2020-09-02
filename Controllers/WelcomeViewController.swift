@@ -13,35 +13,15 @@ import FBSDKLoginKit
 
 class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDelegate {
     
-    // MARK: Facebook Sign-In
-    
-    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
-        if let error = error {
-          print(error.localizedDescription)
-          return
-        }
-
-        if let accessToken = AccessToken.current?.tokenString {
-            let credential = FacebookAuthProvider.credential(withAccessToken: accessToken)
-            Auth.auth().signIn(with: credential) { (authResult, error) in
-               if let error = error {
-                   print(error.localizedDescription)
-               } else {
-                   print("Login successful")
-               }
-               
-            }
-        }
-    }
-    
-    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
-        
-    }
-    
     @IBOutlet weak var facebookLoginButton: FBLoginButton!
     
     var isFirstEntry: Bool {
         return UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) == nil
+    }
+    
+    @IBAction func skipSignIn(_ sender: UIButton) {
+        saveUserLocalDatabase(user: User())
+        self.performSegue(withIdentifier: AppConstraints.bookViewControllerSegueIdentifier, sender: sender)
     }
     
     @IBAction func googleSignInPressed(_ sender: GIDSignInButton) {
@@ -50,25 +30,13 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
-            
-        facebookLoginButton.delegate = self
-        
-        /*
+        setSignInDelegates()
+        print(AppConstraints.databasePath)
         if isFirstEntry {
-            
-            // TODO: create local databases (SQLite)
-            let repositories: [Initializable] = [UserRepository(), BookRepository(), SongRepository(), BookSongRepository()]
-            
-            for repository in repositories {
-                try? repository.createTable()
-            }
+            SQLiteDataAccessLayer.shared.initializeDatabase()
         }
-         */
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
@@ -79,52 +47,86 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
-    // MARK: Google Sign-In
+    private func setSignInDelegates() {
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance()?.presentingViewController = self
+        facebookLoginButton.delegate = self
+    }
     
+    private func logIn(with credential: AuthCredential) {
+        Auth.auth().signIn(with: credential) { (authResult, error) in
+            if let error = error {
+                
+                //TODO: show error user-friendly
+                
+                print(error.localizedDescription)
+            } else {
+                if let currentUser = Auth.auth().currentUser {
+                    self.saveUserLocalDatabase(user: User(globalId: currentUser.uid, name: currentUser.displayName ?? currentUser.uid))
+                    self.performSegue(withIdentifier: AppConstraints.bookViewControllerSegueIdentifier, sender: self)
+                }
+            }
+        }
+    }
+    
+    func logOut() {
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func saveUserLocalDatabase(user: User) {
+        var userRepository = UserRepository()
+        do {
+            let localUserId = try userRepository.insert(element: user)
+            UserDefaults.standard.set("\(localUserId)", forKey: AppConstraints.userLocalIdKey)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    // MARK: Google Sign-In
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if let error = error {
+            
+            // TODO: show error user-friendly
+            
             print(error.localizedDescription)
             return
         }
         
-        /*
-        // Perform any operations on signed in user here.
-        let userId = user.userID                  // For client-side use only!
-        let idToken = user.authentication.idToken // Safe to send to the server
-        let fullName = user.profile.name
-        let givenName = user.profile.givenName
-        let familyName = user.profile.familyName
-        let email = user.profile.email
-        // ...
-        */
-        
         guard let authentication = user.authentication else { return }
+        
         let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
                                                        accessToken: authentication.accessToken)
-        
-         Auth.auth().signIn(with: credential) { (authResult, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print("Login successful")
-            }
-            
-         }
-         
+ 
+        logIn(with: credential)
     }
     
     func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
-        // Perform any operations when the user disconnects from app here.
+        logOut()
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    // MARK: Facebook Sign-In
+    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
+        if let error = error {
+            
+            // TODO: show error user-friendly
+            
+            print(error.localizedDescription)
+            return
+        }
+        
+        guard let authentication = AccessToken.current else { return }
+        
+        let credential = FacebookAuthProvider.credential(withAccessToken: authentication.tokenString)
+        
+        logIn(with: credential)
     }
-    */
-
+    
+    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
+        logOut()
+    }
 }

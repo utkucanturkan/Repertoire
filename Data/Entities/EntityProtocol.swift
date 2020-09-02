@@ -9,5 +9,5 @@
 import Foundation
 
 protocol EntityProtocol {
-    var id: Int64 { get set }
+    var id: Int64? { get set }
 }

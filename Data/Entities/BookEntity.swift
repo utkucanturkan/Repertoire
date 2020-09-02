@@ -9,8 +9,14 @@
 import Foundation
 
 struct Book: EntityProtocol {
-    var id: Int64
-    var name: String
+    
+    // Primary-key
+    var id: Int64?
+    
+    // Reference
     var userId: Int64
+    
+    // Fields
+    var name: String
     var status: Bool
 }

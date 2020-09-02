@@ -19,14 +19,11 @@ struct BookSongRepository: RepositoryProtocol {
     let songFK = Expression<Int64>("songId")
     
     // References
-    let books = Table("books")
-    let bookId = Expression<Int64>("id")
-    
-    let songs = Table("songs")
-    let songId = Expression<Int64>("id")
+    let books = Table(AppConstraints.bookTableName)
+    let songs = Table(AppConstraints.songTableName)
     
     var tableName: String {
-        return "bookSong"
+        return AppConstraints.bookSongTableName
     }
     
     var createTableExpression: String {
@@ -34,8 +31,8 @@ struct BookSongRepository: RepositoryProtocol {
             t.column(id, primaryKey: .autoincrement)
             t.column(bookFK)
             t.column(songFK)
-            t.foreignKey(bookFK, references: books, bookId, delete: .cascade)
-            t.foreignKey(songFK, references: songs, songId, delete: .cascade)
+            t.foreignKey(bookFK, references: books, id, delete: .cascade)
+            t.foreignKey(songFK, references: songs, id, delete: .cascade)
         }
     }
     
@@ -44,14 +41,14 @@ struct BookSongRepository: RepositoryProtocol {
     }
             
     var deleteExpression: Delete {
-        return table.filter(id == model!.id).delete()
+        return table.filter(id == model!.id!).delete()
     }
     
     var updateExpression: Update {
-        return table.filter(id == model!.id).update(bookFK <- model!.bookId, songFK <- model!.songId)
+        return table.filter(id == model!.id!).update(bookFK <- model!.bookId, songFK <- model!.songId)
     }
     
-    func getSongCountBy(bookId bId: Int64) throws -> Int {
+    func getSongCountBy(bookIdentifier bId: Int64) throws -> Int {
         guard let database = SQLiteDataAccessLayer.shared.db else { throw DataAccessError.Datastore_Connection_Error }
         return try database.scalar(table.filter(bookFK == bId).count)
     }

@@ -8,11 +8,18 @@
 
 import UIKit
 import SQLite
+import Firebase
 
 class BookTableViewController: UITableViewController {
+
+    var books: [BookViewModel]? {
+        didSet {
+            tableView?.reloadData()
+        }
+    }
     
-    private func setFirstEntry(_ state: Bool) {
-        UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
+    var localUserId: String {
+        return UserDefaults.standard.string(forKey: AppConstraints.userLocalIdKey)!
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -20,30 +27,38 @@ class BookTableViewController: UITableViewController {
         self.tabBarController?.navigationController?.setNavigationBarHidden(true, animated: true)
         self.tabBarController?.navigationController?.navigationItem.setHidesBackButton(true, animated: true)
     }
-        
-    let bookRepository = BookRepository()
-    
-    var books: [BookViewModel]? {
-        didSet {
-            tableView?.reloadData()
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setFirstEntry(false)
         self.title = "Books"
-        
-        //books = try? bookRepository.getAllBy(userId: 1)
-        
-        
+        setFirstEntry(false)
+        getBooksOfCurrentUser()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
+    private func getBooksOfCurrentUser() {
+        if let user = Auth.auth().currentUser {
+            
+        } else {
+            let bookRepository = BookRepository()
+            if let userId = Int64(localUserId) {
+                do {
+                    books = try bookRepository.getAllBy(userIdentifier: userId)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        }
+     }
+    
+    private func setFirstEntry(_ state: Bool) {
+        UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -54,7 +69,6 @@ class BookTableViewController: UITableViewController {
         return books?.count ?? 0
     }
 
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.bookCellIdentifier, for: indexPath) as! BookTableViewCell
 

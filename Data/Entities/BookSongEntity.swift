@@ -9,7 +9,11 @@
 import Foundation
 
 struct BookSong: EntityProtocol {
-    var id: Int64
+    
+    // Primary-key
+    var id: Int64?
+    
+    // References
     var bookId: Int64
     var songId: Int64
 }

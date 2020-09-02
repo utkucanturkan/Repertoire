@@ -33,6 +33,17 @@ struct SQLiteDataAccessLayer {
         }
     }
     
+    func initializeDatabase() {
+        let repositories: [InitializableRepository] = [UserRepository(), BookRepository(), SongRepository(), BookSongRepository()]
+        do {
+            for initializableRepository in repositories {
+               try initializableRepository.createTable()
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     func createTable(expression: String) throws {
         guard let database = db else {
             throw DataAccessError.Datastore_Connection_Error
@@ -40,7 +51,9 @@ struct SQLiteDataAccessLayer {
         
         do {
             try database.run(expression)
-        } catch _ {
+        } catch {
+            print(error.localizedDescription)
+            
             // thrown an error if table already exists
         }
     }

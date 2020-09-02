@@ -15,16 +15,18 @@ struct UserRepository: RepositoryProtocol {
     typealias Entity = User
         
     // Expressions
-    let userName = Expression<String>("userName")
+    let name = Expression<String>("name")
+    let globalId = Expression<String?>("globalId")
     
     var tableName: String {
-        return "users"
+        return AppConstraints.userTableName
     }
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
             t.column(id, primaryKey: .autoincrement)
-            t.column(userName)
+            t.column(globalId)
+            t.column(name)
             t.column(created, defaultValue: Date())
             t.column(updated)
             t.column(status, defaultValue: true)
@@ -32,14 +34,14 @@ struct UserRepository: RepositoryProtocol {
     }
 
     var insertExpression: Insert {
-        return table.insert(userName <- model!.userName, status <- model!.status)
+        return table.insert(name <- model!.name, globalId <- model!.globalId, status <- model!.status)
     }
     
     var updateExpression: Update {
-        return table.filter(id == model!.id).update(userName <- model!.userName, status <- model!.status)
+        return table.filter(id == model!.id!).update(name <- model!.name, status <- model!.status)
     }
     
     var deleteExpression: Delete {
-        return table.filter(id == model!.id).delete()
+        return table.filter(id == model!.id!).delete()
     }
 }

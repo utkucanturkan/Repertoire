@@ -9,7 +9,12 @@
 import Foundation
 
 struct User: EntityProtocol {
-    var id: Int64
-    var userName: String
-    var status: Bool
+    
+    // Primary-key
+    var id: Int64?
+    
+    // Fields
+    var globalId: String?
+    var name: String = AppConstraints.localUserName
+    var status: Bool = true
 }

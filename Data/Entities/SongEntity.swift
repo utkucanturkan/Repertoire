@@ -9,7 +9,14 @@
 import Foundation
 
 struct Song: EntityProtocol {
-    var id: Int64
+    
+    // Primary-key
+    var id: Int64?
+    
+    // Reference
+    var userId: Int64
+    
+    // Fields
     var name: String
     var content: String
     var mediaUrl: String
