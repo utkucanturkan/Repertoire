@@ -20,9 +20,11 @@ struct AppConstraints {
     
     // Cell Identifiers
     static let bookCellIdentifier = "bookCell"
+    static let songCellIdentifier = "songCell"
     
     // Segue Identifiers
     static let bookViewControllerSegueIdentifier = "BookViewControllerSegue"
+    static let bookDetailViewControllerSegueIdentifier = "BookDetailSegue"
     
     // Local Database
     static let defaultLocalUserName = "localUser"

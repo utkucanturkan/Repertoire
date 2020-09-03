@@ -25,7 +25,11 @@ class BookTableViewController: UITableViewController {
     // MARK: Searching
     let searchController = UISearchController(searchResultsController: nil)
     
-    var filteredBooks = [BookViewModel]()
+    var filteredBooks = [BookViewModel]() {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     
     var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
@@ -62,9 +66,8 @@ class BookTableViewController: UITableViewController {
     
     private func filterModelForSearchText(_ searchText: String) {
         filteredBooks = books.filter { (book) in
-            return book.name.contains(searchText.lowercased())
+            return book.name.lowercased().contains(searchText.lowercased())
         }
-        tableView.reloadData()
     }
     
     private func getBooksOfCurrentUser() {
@@ -91,39 +94,24 @@ class BookTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isfiltering {
-            return filteredBooks.count
-        }
-        
-        return books.count
+        return isfiltering ? filteredBooks.count : books.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.bookCellIdentifier, for: indexPath) as! BookTableViewCell
-
-        let book: BookViewModel
-        
-        if isfiltering {
-            book = filteredBooks[indexPath.row]
-        } else {
-            book = books[indexPath.row]
-        }
-        
+        let book = isfiltering ? filteredBooks[indexPath.row] : books[indexPath.row]
         cell.model = book
-
         return cell
     }
-    
 
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
+    
 
-    /*
+    
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -133,7 +121,7 @@ class BookTableViewController: UITableViewController {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    */
+    
 
     /*
     // Override to support rearranging the table view.
@@ -150,15 +138,20 @@ class BookTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+
+        if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
+            if let bdvc = segue.destination as? BookDetailTableViewController, let bcv = sender as? BookTableViewCell {
+                bdvc.model = bcv.model
+            }
+        }
+        
     }
-    */
+    
 
 }
 

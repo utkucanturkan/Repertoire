@@ -60,7 +60,7 @@ struct BookRepository: RepositoryProtocol {
         for row in try database.prepare(table.filter(userFK == userId).filter(status == true).order(created))
         {
             let songCount = try? bookSongRepository.getSongCountBy(bookIdentifier: row[id])
-            result.append(BookViewModel(name: row[name], createdDate: row[created], songCount: songCount ?? 0))
+            result.append(BookViewModel(localId: row[id], name: row[name], createdDate: row[created], songCount: songCount ?? 0))
         }
         
         return result

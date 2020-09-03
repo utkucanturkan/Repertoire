@@ -176,6 +176,7 @@
                                     <outlet property="createdDate" destination="LLq-Yl-IsU" id="Tp1-ZB-UqS"/>
                                     <outlet property="name" destination="D1s-0q-RCf" id="YXO-tq-8cj"/>
                                     <outlet property="songCount" destination="6ye-4i-9q0" id="MQx-iN-cVh"/>
+                                    <segue destination="ews-0q-y2T" kind="show" identifier="BookDetailSegue" id="XzK-Il-U3W"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -185,12 +186,41 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="UZF-mt-Uqm">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="fmF-bb-6UW"/>
+                        <barButtonItem key="leftBarButtonItem" systemItem="add" id="e28-QM-lgt"/>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xIs-xE-hk7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2207.2463768115945" y="-812.27678571428567"/>
+        </scene>
+        <!--Book Detail Table View Controller-->
+        <scene sceneID="nws-G5-nJO">
+            <objects>
+                <tableViewController id="ews-0q-y2T" customClass="BookDetailTableViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="EX8-Cs-HeA">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="songCell" id="fqW-wA-q4s">
+                                <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fqW-wA-q4s" id="pca-sZ-iXt">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="ews-0q-y2T" id="g8n-KQ-GVu"/>
+                            <outlet property="delegate" destination="ews-0q-y2T" id="yHZ-ME-CWI"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="oA5-eh-EmY"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="f5w-mK-SqG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3139" y="-812"/>
         </scene>
         <!--Book-->
         <scene sceneID="9v0-LN-5sx">
