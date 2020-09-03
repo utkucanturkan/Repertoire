@@ -16,8 +16,7 @@ struct AppConstraints {
     static let homeViewControllerStoryboardId = "HomeViewController"
     
     // Userdefault Keys
-    static let firstEntryKey = "isFirstEntry"
-    static let userLocalIdKey = "userLocalId"
+    static let userSessionKey = "applicationUserSession"
     
     // Cell Identifiers
     static let bookCellIdentifier = "bookCell"
@@ -26,7 +25,7 @@ struct AppConstraints {
     static let bookViewControllerSegueIdentifier = "BookViewControllerSegue"
     
     // Local Database
-    static let localUserName = "localUser"
+    static let defaultLocalUserName = "localUser"
     static let databasePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
     static let userTableName = "users"
     static let songTableName = "songs"

@@ -18,5 +18,5 @@ struct Book: EntityProtocol {
     
     // Fields
     var name: String
-    var status: Bool
+    var status: Bool = true
 }

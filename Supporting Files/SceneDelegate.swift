@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -22,7 +23,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
 
-        let initialViewControllerStoryBoardId = UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) == nil ? AppConstraints.welcomeViewControllerStoryboardId : AppConstraints.homeViewControllerStoryboardId
+        let hasAppUserSession = try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
+        
+        let initialViewControllerStoryBoardId = hasAppUserSession == nil ? AppConstraints.welcomeViewControllerStoryboardId : AppConstraints.homeViewControllerStoryboardId
         
         let initialViewControler = storyboard.instantiateViewController(withIdentifier: initialViewControllerStoryBoardId)
                 

@@ -13,12 +13,13 @@ import FBSDKLoginKit
 
 class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDelegate {
     
-    @IBOutlet weak var facebookLoginButton: FBLoginButton!
-    
-    var isFirstEntry: Bool {
-        return UserDefaults.standard.object(forKey: AppConstraints.firstEntryKey) == nil
+    var hasApplicationSession: Bool {
+        let session = try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
+        return session != nil
     }
     
+    @IBOutlet weak var facebookLoginButton: FBLoginButton!
+        
     @IBAction func skipSignIn(_ sender: UIButton) {
         saveUserLocalDatabase(user: User())
         self.performSegue(withIdentifier: AppConstraints.bookViewControllerSegueIdentifier, sender: sender)
@@ -32,7 +33,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         super.viewDidLoad()
         setSignInDelegates()
         print(AppConstraints.databasePath)
-        if isFirstEntry {
+        if !hasApplicationSession {
             SQLiteDataAccessLayer.shared.initializeDatabase()
         }
     }
@@ -77,11 +78,32 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         }
     }
     
-    func saveUserLocalDatabase(user: User) {
+    private func initializeUserSession(withLocalId localId: Int64, of user: User) {
+        do {
+            let userSession = ApplicationUserSession(localId: localId, globalId: user.globalId, userName: user.name)
+            try UserDefaults.standard.setEncodable(object: userSession, with: AppConstraints.userSessionKey)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func saveUserLocalDatabase(user: User) {
         var userRepository = UserRepository()
         do {
-            let localUserId = try userRepository.insert(element: user)
-            UserDefaults.standard.set("\(localUserId)", forKey: AppConstraints.userLocalIdKey)
+            let userLocalId = try userRepository.insert(element: user)
+            
+            initializeUserSession(withLocalId: userLocalId, of: user)
+            
+            var bookRepository = BookRepository()
+            for index in 1...10 {
+                do {
+                    let book = Book(userId: userLocalId, name: "Book-\(index)")
+                    try bookRepository.insert(element: book)
+                } catch {
+                    
+                }
+            }
+            
         } catch {
             print(error.localizedDescription)
         }

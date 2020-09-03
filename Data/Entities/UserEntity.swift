@@ -15,6 +15,6 @@ struct User: EntityProtocol {
     
     // Fields
     var globalId: String?
-    var name: String = AppConstraints.localUserName
+    var name: String = AppConstraints.defaultLocalUserName
     var status: Bool = true
 }

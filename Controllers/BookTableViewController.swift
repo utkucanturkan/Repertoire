@@ -18,8 +18,8 @@ class BookTableViewController: UITableViewController {
         }
     }
     
-    var localUserId: String {
-        return UserDefaults.standard.string(forKey: AppConstraints.userLocalIdKey)!
+    var userSession: ApplicationUserSession? {
+        return try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -31,7 +31,6 @@ class BookTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Books"
-        setFirstEntry(false)
         getBooksOfCurrentUser()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -39,26 +38,24 @@ class BookTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
-
+    
     private func getBooksOfCurrentUser() {
-        if let user = Auth.auth().currentUser {
-            
-        } else {
-            let bookRepository = BookRepository()
-            if let userId = Int64(localUserId) {
+        if let user = userSession {
+            if user.islocal {
+                let bookRepository = BookRepository()
                 do {
-                    books = try bookRepository.getAllBy(userIdentifier: userId)
+                    books = try bookRepository.getAllBy(userIdentifier: user.localId)
                 } catch {
                     print(error.localizedDescription)
                 }
+            } else {
+                
+                // TODO: get books from firebase cloud store
+                
             }
         }
-     }
-    
-    private func setFirstEntry(_ state: Bool) {
-        UserDefaults.standard.set(state, forKey: AppConstraints.firstEntryKey)
     }
-    
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
