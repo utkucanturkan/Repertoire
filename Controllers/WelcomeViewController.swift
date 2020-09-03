@@ -32,7 +32,6 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignInDelegates()
-        print(AppConstraints.databasePath)
         if !hasApplicationSession {
             SQLiteDataAccessLayer.shared.initializeDatabase()
         }
@@ -70,7 +69,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         }
     }
     
-    func logOut() {
+    private func logOut() {
         do {
             try Auth.auth().signOut()
         } catch {
@@ -91,19 +90,9 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         var userRepository = UserRepository()
         do {
             let userLocalId = try userRepository.insert(element: user)
-            
             initializeUserSession(withLocalId: userLocalId, of: user)
-            
-            var bookRepository = BookRepository()
-            for index in 1...10 {
-                do {
-                    let book = Book(userId: userLocalId, name: "Book-\(index)")
-                    try bookRepository.insert(element: book)
-                } catch {
-                    
-                }
-            }
-            
+            // to remove the information of the firebase auth from the keychain
+            logOut()
         } catch {
             print(error.localizedDescription)
         }
@@ -118,12 +107,9 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
             print(error.localizedDescription)
             return
         }
-        
         guard let authentication = user.authentication else { return }
-        
         let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
                                                        accessToken: authentication.accessToken)
- 
         logIn(with: credential)
     }
     
@@ -140,11 +126,8 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
             print(error.localizedDescription)
             return
         }
-        
         guard let authentication = AccessToken.current else { return }
-        
         let credential = FacebookAuthProvider.credential(withAccessToken: authentication.tokenString)
-        
         logIn(with: credential)
     }
     

@@ -17,7 +17,7 @@ class ApplicationUserSession: Codable {
     }
     
     var islocal: Bool {
-        return globalId != nil
+        return globalId == nil
     }
     
     var localId: Int64

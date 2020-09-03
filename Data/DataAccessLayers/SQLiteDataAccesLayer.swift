@@ -28,6 +28,7 @@ struct SQLiteDataAccessLayer {
     private init() {
         do {
             db = try Connection(dbPath)
+            print(AppConstraints.databasePath)
         } catch _ {
             db = nil
         }

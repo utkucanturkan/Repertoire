@@ -12,14 +12,27 @@ import Firebase
 
 class BookTableViewController: UITableViewController {
 
-    var books: [BookViewModel]? {
+    var books = [BookViewModel]() {
         didSet {
             tableView?.reloadData()
         }
     }
-    
+        
     var userSession: ApplicationUserSession? {
         return try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
+    }
+    
+    // MARK: Searching
+    let searchController = UISearchController(searchResultsController: nil)
+    
+    var filteredBooks = [BookViewModel]()
+    
+    var isSearchBarEmpty: Bool {
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    var isfiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -32,11 +45,26 @@ class BookTableViewController: UITableViewController {
         super.viewDidLoad()
         self.title = "Books"
         getBooksOfCurrentUser()
+        
+        // SearchController
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search any book of song"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    
+    private func filterModelForSearchText(_ searchText: String) {
+        filteredBooks = books.filter { (book) in
+            return book.name.contains(searchText.lowercased())
+        }
+        tableView.reloadData()
     }
     
     private func getBooksOfCurrentUser() {
@@ -63,13 +91,25 @@ class BookTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return books?.count ?? 0
+        if isfiltering {
+            return filteredBooks.count
+        }
+        
+        return books.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.bookCellIdentifier, for: indexPath) as! BookTableViewCell
 
-        cell.model = books?[indexPath.row]
+        let book: BookViewModel
+        
+        if isfiltering {
+            book = filteredBooks[indexPath.row]
+        } else {
+            book = books[indexPath.row]
+        }
+        
+        cell.model = book
 
         return cell
     }
@@ -120,4 +160,11 @@ class BookTableViewController: UITableViewController {
     }
     */
 
+}
+
+extension BookTableViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterModelForSearchText(searchBar.text!)
+    }
 }
