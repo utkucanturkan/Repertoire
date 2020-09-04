@@ -12,6 +12,6 @@ struct BookViewModel {
     var localId: Int64
     var globalId: String?
     var name: String
-    var createdDate: Date
-    var songCount: Int
+    var createdDate: Date = Date()
+    var songCount: Int = 0
 }

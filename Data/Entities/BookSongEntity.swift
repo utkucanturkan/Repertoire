@@ -16,4 +16,5 @@ struct BookSong: EntityProtocol {
     // References
     var bookId: Int64
     var songId: Int64
+    var songIndex: Int64
 }

@@ -17,6 +17,7 @@ struct BookSongRepository: RepositoryProtocol {
     // Expressions
     let bookFK = Expression<Int64>("bookId")
     let songFK = Expression<Int64>("songId")
+    let songIndex = Expression<Int64>("songIndex")
     
     // References
     let books = Table(AppConstraints.bookTableName)
@@ -31,13 +32,14 @@ struct BookSongRepository: RepositoryProtocol {
             t.column(id, primaryKey: .autoincrement)
             t.column(bookFK)
             t.column(songFK)
+            t.column(songIndex)
             t.foreignKey(bookFK, references: books, id, delete: .cascade)
             t.foreignKey(songFK, references: songs, id, delete: .cascade)
         }
     }
     
     var insertExpression: Insert {
-        return table.insert(bookFK <- model!.bookId, songFK <- model!.songId)
+        return table.insert(bookFK <- model!.bookId, songFK <- model!.songId, songIndex <- model!.songIndex)
     }
             
     var deleteExpression: Delete {
@@ -45,7 +47,7 @@ struct BookSongRepository: RepositoryProtocol {
     }
     
     var updateExpression: Update {
-        return table.filter(id == model!.id!).update(bookFK <- model!.bookId, songFK <- model!.songId)
+        return table.filter(id == model!.id!).update(bookFK <- model!.bookId, songFK <- model!.songId, songIndex <- model!.songIndex)
     }
     
     func getSongCountBy(bookIdentifier bId: Int64) throws -> Int {

@@ -18,9 +18,11 @@ class BookTableViewController: UITableViewController {
         }
     }
         
-    var userSession: ApplicationUserSession? {
-        return try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
+    var userSession: ApplicationUserSession {
+        return try! UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
     }
+    
+    var bookRepository = BookRepository()
     
     // MARK: Searching
     let searchController = UISearchController(searchResultsController: nil)
@@ -64,6 +66,47 @@ class BookTableViewController: UITableViewController {
         self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
     
+    @IBAction func addBookButtonTapped(_ sender: UIBarButtonItem) {
+        let alert = UIAlertController(title: "New Book", message: "Set a name of the new book", preferredStyle: .alert)
+    
+                
+        alert.addTextField { textField in
+            textField.placeholder = "Input a new book name"
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { [unowned self] action in
+            if let newBookName = alert.textFields?.first?.text {
+                if let newBookIds = self.addNewBook(with: newBookName) {
+                    let bdvc = BookDetailTableViewController()
+                    let newBookViewmodel = BookViewModel(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
+                    bdvc.model = newBookViewmodel
+                    self.books.append(newBookViewmodel)
+                    self.navigationController?.pushViewController(bdvc, animated: true)
+                }
+            }
+        })
+        
+        self.present(alert, animated: true)
+    }
+    
+    private func addNewBook(with name: String) -> (localId: Int64, globalId: String?)? {
+        var result: (localId: Int64, globalId: String?)
+        
+        // !!!!
+        result.globalId = nil
+        
+        do {
+            let newBook = Book(userId: userSession.localId, name: name)
+            result.localId = try bookRepository.insert(element: newBook)
+            return result
+        } catch {
+            print(error.localizedDescription)
+        }
+        return nil
+    }
+    
     private func filterModelForSearchText(_ searchText: String) {
         filteredBooks = books.filter { (book) in
             return book.name.lowercased().contains(searchText.lowercased())
@@ -71,24 +114,20 @@ class BookTableViewController: UITableViewController {
     }
     
     private func getBooksOfCurrentUser() {
-        if let user = userSession {
-            if user.islocal {
-                let bookRepository = BookRepository()
-                do {
-                    books = try bookRepository.getAllBy(userIdentifier: user.localId)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            } else {
-                
-                // TODO: get books from firebase cloud store
-                
+        if userSession.islocal {
+            do {
+                books = try bookRepository.getAllBy(userIdentifier: userSession.localId)
+            } catch {
+                print(error.localizedDescription)
             }
+        } else {
+            
+            // TODO: get books from firebase cloud store
+            
         }
     }
 
     // MARK: - Table view data source
-
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -110,8 +149,6 @@ class BookTableViewController: UITableViewController {
         return true
     }
     
-
-    
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -121,38 +158,15 @@ class BookTableViewController: UITableViewController {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-
         if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
             if let bdvc = segue.destination as? BookDetailTableViewController, let bcv = sender as? BookTableViewCell {
                 bdvc.model = bcv.model
             }
         }
-        
     }
-    
-
 }
 
 extension BookTableViewController: UISearchResultsUpdating {

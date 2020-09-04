@@ -38,10 +38,16 @@ struct BookRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
+        
+        // TODO: check whether the new model name is already existed or not
+        
         return table.insert(name <- model!.name, userFK <- model!.userId, status <- model!.status)
     }
 
     var updateExpression: Update {
+        
+        // TODO: check whether the updating model name is already existed or not
+        
         return table.filter(id == model!.id!).update(name <- model!.name, status <- model!.status)
     }
  
