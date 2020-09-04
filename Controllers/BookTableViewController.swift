@@ -12,11 +12,7 @@ import Firebase
 
 class BookTableViewController: UITableViewController {
 
-    var books = [BookViewModel]() {
-        didSet {
-            tableView?.reloadData()
-        }
-    }
+    var books = [BookViewModel]()
         
     var userSession: ApplicationUserSession {
         return try! UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
@@ -29,7 +25,7 @@ class BookTableViewController: UITableViewController {
     
     var filteredBooks = [BookViewModel]() {
         didSet {
-            tableView.reloadData()
+            tableView?.reloadData()
         }
     }
     
@@ -69,7 +65,6 @@ class BookTableViewController: UITableViewController {
     @IBAction func addBookButtonTapped(_ sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "New Book", message: "Set a name of the new book", preferredStyle: .alert)
     
-                
         alert.addTextField { textField in
             textField.placeholder = "Input a new book name"
         }
@@ -83,6 +78,7 @@ class BookTableViewController: UITableViewController {
                     let newBookViewmodel = BookViewModel(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
                     bdvc.model = newBookViewmodel
                     self.books.append(newBookViewmodel)
+                    self.tableView.reloadData()
                     self.navigationController?.pushViewController(bdvc, animated: true)
                 }
             }
@@ -113,10 +109,22 @@ class BookTableViewController: UITableViewController {
         }
     }
     
+    private func deleteBook(_ bookViewModel: BookViewModel) {
+        
+        do {
+            let deletedBook = Book(id: bookViewModel.localId, userId: userSession.localId, name: bookViewModel.name)
+            try bookRepository.delete(element: deletedBook)
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+    }
+    
     private func getBooksOfCurrentUser() {
         if userSession.islocal {
             do {
                 books = try bookRepository.getAllBy(userIdentifier: userSession.localId)
+                tableView.reloadData()
             } catch {
                 print(error.localizedDescription)
             }
@@ -152,7 +160,8 @@ class BookTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+            let deletedBook = books.remove(at: indexPath.row)
+            deleteBook(deletedBook)
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
