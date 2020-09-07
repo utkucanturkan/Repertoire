@@ -10,6 +10,10 @@ import Foundation
 
 class ApplicationUserSession: Codable {
     
+    static var session: ApplicationUserSession? {
+        return try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
+    }
+    
     init(localId: Int64, globalId: String?, userName: String) {
         self.localId = localId
         self.globalId = globalId

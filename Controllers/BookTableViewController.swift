@@ -13,11 +13,7 @@ import Firebase
 class BookTableViewController: UITableViewController {
 
     var books = [BookViewModel]()
-        
-    var userSession: ApplicationUserSession {
-        return try! UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
-    }
-    
+            
     var bookRepository = BookRepository()
     
     // MARK: Searching
@@ -74,11 +70,11 @@ class BookTableViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "Save", style: .default) { [unowned self] action in
             if let newBookName = alert.textFields?.first?.text {
                 if let newBookIds = self.addNewBook(with: newBookName) {
-                    let bdvc = BookDetailTableViewController()
                     let newBookViewmodel = BookViewModel(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
-                    bdvc.model = newBookViewmodel
                     self.books.append(newBookViewmodel)
                     self.tableView.reloadData()
+                    let bdvc = BookDetailTableViewController()
+                    bdvc.model = newBookViewmodel
                     self.navigationController?.pushViewController(bdvc, animated: true)
                 }
             }
@@ -88,15 +84,17 @@ class BookTableViewController: UITableViewController {
     }
     
     private func addNewBook(with name: String) -> (localId: Int64, globalId: String?)? {
-        var result: (localId: Int64, globalId: String?)
-        
-        // !!!!
-        result.globalId = nil
-        
+        var newAddedBook: (localId: Int64, globalId: String?)
+        newAddedBook.globalId = nil
         do {
-            let newBook = Book(userId: userSession.localId, name: name)
-            result.localId = try bookRepository.insert(element: newBook)
-            return result
+            let book = Book(userId: ApplicationUserSession.session!.localId, name: name)
+            newAddedBook.localId = try bookRepository.insert(element: book)
+            if !ApplicationUserSession.session!.islocal {
+                
+                // TODO: add a new book into the firebase cloud store, and set the globalId property of the newly added book
+                
+            }
+            return newAddedBook
         } catch {
             print(error.localizedDescription)
         }
@@ -110,20 +108,23 @@ class BookTableViewController: UITableViewController {
     }
     
     private func deleteBook(_ bookViewModel: BookViewModel) {
-        
         do {
-            let deletedBook = Book(id: bookViewModel.localId, userId: userSession.localId, name: bookViewModel.name)
+            let deletedBook = Book(id: bookViewModel.localId, userId: ApplicationUserSession.session!.localId, name: bookViewModel.name)
             try bookRepository.delete(element: deletedBook)
+            if !ApplicationUserSession.session!.islocal {
+                
+                // TODO: delete book from firebase cloud store
+                
+            }
         } catch {
             print(error.localizedDescription)
         }
-        
     }
     
     private func getBooksOfCurrentUser() {
-        if userSession.islocal {
+        if ApplicationUserSession.session!.islocal {
             do {
-                books = try bookRepository.getAllBy(userIdentifier: userSession.localId)
+                books = try bookRepository.getAllBy(userIdentifier: ApplicationUserSession.session!.localId)
                 tableView.reloadData()
             } catch {
                 print(error.localizedDescription)
@@ -141,7 +142,13 @@ class BookTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return isfiltering ? filteredBooks.count : books.count
+        let totalDataCount = isfiltering ? filteredBooks.count : books.count
+        if totalDataCount == 0 {
+            tableView.setEmptyView(title: "No data", message: "You have not any song book")
+        } else {
+            tableView.restore()
+        }
+        return totalDataCount
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -153,7 +160,6 @@ class BookTableViewController: UITableViewController {
 
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
         return true
     }
     
@@ -163,9 +169,7 @@ class BookTableViewController: UITableViewController {
             let deletedBook = books.remove(at: indexPath.row)
             deleteBook(deletedBook)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
 
     // MARK: - Navigation

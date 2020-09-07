@@ -12,12 +12,7 @@ import GoogleSignIn
 import FBSDKLoginKit
 
 class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDelegate {
-    
-    var hasApplicationSession: Bool {
-        let session = try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
-        return session != nil
-    }
-    
+        
     @IBOutlet weak var facebookLoginButton: FBLoginButton!
         
     @IBAction func skipSignIn(_ sender: UIButton) {
@@ -32,9 +27,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignInDelegates()
-        if !hasApplicationSession {
-            SQLiteDataAccessLayer.shared.initializeDatabase()
-        }
+        initializeLocalDatabase()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,6 +38,12 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    private func initializeLocalDatabase() {
+        if ApplicationUserSession.session == nil {
+            SQLiteDataAccessLayer.shared.initializeDatabase()
+        }
     }
     
     private func setSignInDelegates() {
@@ -77,7 +76,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         }
     }
     
-    private func initializeUserSession(withLocalId localId: Int64, of user: User) {
+    private func initializeUserSession(with localId: Int64, of user: User) {
         do {
             let userSession = ApplicationUserSession(localId: localId, globalId: user.globalId, userName: user.name)
             try UserDefaults.standard.setEncodable(object: userSession, with: AppConstraints.userSessionKey)
@@ -90,26 +89,25 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         var userRepository = UserRepository()
         do {
             let userLocalId = try userRepository.insert(element: user)
-            initializeUserSession(withLocalId: userLocalId, of: user)
-            // to remove the information of the firebase auth from the keychain
-            logOut()
+            initializeUserSession(with: userLocalId, of: user)
+            logOut()             // to remove the information of the firebase auth from the keychain
         } catch {
             print(error.localizedDescription)
         }
     }
     
     // MARK: Google Sign-In
+    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if let error = error {
             
-            // TODO: show error user-friendly
+            // TODO: show error user-friendly, SignInError
             
             print(error.localizedDescription)
             return
         }
         guard let authentication = user.authentication else { return }
-        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
-                                                       accessToken: authentication.accessToken)
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
         logIn(with: credential)
     }
     
@@ -118,11 +116,12 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     }
     
     // MARK: Facebook Sign-In
+    
     func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
         if let error = error {
             
-            // TODO: show error user-friendly
-            
+            // TODO: show error user-friendly, SignInError
+                        
             print(error.localizedDescription)
             return
         }

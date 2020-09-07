@@ -23,9 +23,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
 
-        let hasAppUserSession = try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
+        let appUserSession = try? UserDefaults.standard.getDecodable(with: AppConstraints.userSessionKey, by: ApplicationUserSession.self)
         
-        let initialViewControllerStoryBoardId = hasAppUserSession == nil ? AppConstraints.welcomeViewControllerStoryboardId : AppConstraints.homeViewControllerStoryboardId
+        let initialViewControllerStoryBoardId = appUserSession == nil ? AppConstraints.welcomeViewControllerStoryboardId : AppConstraints.homeViewControllerStoryboardId
         
         let initialViewControler = storyboard.instantiateViewController(withIdentifier: initialViewControllerStoryBoardId)
                 
