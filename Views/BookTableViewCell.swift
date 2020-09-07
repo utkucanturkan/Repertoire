@@ -23,9 +23,15 @@ class BookTableViewCell: UITableViewCell {
     private func updateCell() {
         if let book = model {
             name?.text = book.name
-            songCount?.text = "\(book.songCount)"
-            createdDate?.text = book.createdDate.description
+            songCount?.text = book.songCount == 0 ? "No Song" : "\(book.songCount) song(s)"
+            createdDate?.text = format(date: book.createdDate, as: "MM/dd/yyyy")
         }
+    }
+    
+    func format(date date:Date, as format: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: date)
     }
     
     override func awakeFromNib() {

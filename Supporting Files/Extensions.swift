@@ -9,16 +9,6 @@
 import Foundation
 import UIKit
 
-enum ObjectSavableError: String, LocalizedError {
-    case unableToEncode = "Unable to encode object into data"
-    case noValue = "No data object found for the given key"
-    case unableToDecode = "Unable to decode object into given type"
-    
-    var errorDescription: String? {
-        rawValue
-    }
-}
-
 extension UserDefaults {
     func setEncodable<Object>(object item: Object, with key:String) throws where Object: Encodable {
         do {
@@ -51,7 +41,6 @@ extension UITableView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        titleLabel.textColor = UIColor.black
         messageLabel.textColor = UIColor.lightGray
         
         emptyView.addSubview(titleLabel)
@@ -60,7 +49,7 @@ extension UITableView {
         // Constraints
         titleLabel.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor).isActive = true
         titleLabel.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor).isActive = true
-        messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20).isActive = true
+        messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
         messageLabel.leftAnchor.constraint(equalTo: emptyView.leftAnchor, constant: 20).isActive = true
         messageLabel.rightAnchor.constraint(equalTo: emptyView.rightAnchor, constant: -20).isActive = true
         
