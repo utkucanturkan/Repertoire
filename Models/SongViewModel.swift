@@ -9,5 +9,7 @@
 import Foundation
 
 struct SongViewModel {
-    
+    var id: Int64
+    var name: String
+    var index: Int64
 }

@@ -50,9 +50,8 @@ struct BookSongRepository: RepositoryProtocol {
         return table.filter(id == model!.id!).update(bookFK <- model!.bookId, songFK <- model!.songId, songIndex <- model!.songIndex)
     }
     
-    func getSongCountBy(bookIdentifier bId: Int64) throws -> Int {
+    func getTotalSongCount(by bookIdentifier: Int64) throws -> Int {
         guard let database = SQLiteDataAccessLayer.shared.db else { throw DataAccessError.Datastore_Connection_Error }
-        return try database.scalar(table.filter(bookFK == bId).count)
-    }
-    
+        return try database.scalar(table.filter(bookFK == bookIdentifier).count)
+    }    
 }

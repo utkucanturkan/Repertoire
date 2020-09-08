@@ -12,24 +12,24 @@ import Firebase
 
 class BookTableViewController: UITableViewController {
 
-    var model = [BookViewModel]()
+    private var model = [BookViewModel]()
             
-    var bookRepository = BookRepository()
+    private var bookRepository = BookRepository()
     
     // MARK: Searching
-    let searchController = UISearchController(searchResultsController: nil)
+    private let searchController = UISearchController(searchResultsController: nil)
     
-    var filteredModel = [BookViewModel]() {
+    private var filteredModel = [BookViewModel]() {
         didSet {
             tableView?.reloadData()
         }
     }
     
-    var isSearchBarEmpty: Bool {
+    private var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
     }
     
-    var isfiltering: Bool {
+    private var isfiltering: Bool {
         return searchController.isActive && !isSearchBarEmpty
     }
     
@@ -75,7 +75,7 @@ class BookTableViewController: UITableViewController {
                     self.model.append(newBookViewmodel)
                     self.tableView.reloadData()
                     let bdvc = BookDetailTableViewController()
-                    bdvc.model = newBookViewmodel
+                    bdvc.bookModel = newBookViewmodel
                     self.navigationController?.pushViewController(bdvc, animated: true)
                 }
             }
@@ -145,7 +145,7 @@ class BookTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let totalDataCount = isfiltering ? filteredModel.count : model.count
         if totalDataCount == 0 {
-            tableView.setEmptyView(title: "You have not any song book", message: "A new book can be added by + button on the left corner")
+            tableView.setEmptyView(title: "You have not any song book", message: isfiltering ? "" : "A new book can be added by + button on the left corner")
         } else {
             tableView.restore()
         }
@@ -177,7 +177,7 @@ class BookTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
             if let bdvc = segue.destination as? BookDetailTableViewController, let bcv = sender as? BookTableViewCell {
-                bdvc.model = bcv.model
+                bdvc.bookModel = bcv.model
             }
         }
     }

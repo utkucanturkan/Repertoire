@@ -10,6 +10,20 @@ import UIKit
 
 class SongTableViewCell: UITableViewCell {
 
+    var song: SongViewModel? {
+        didSet {
+            updateCell()
+        }
+    }
+    
+    @IBOutlet weak var name: UILabel!
+    
+    private func updateCell() {
+        if let songModel = song {
+            name?.text = songModel.name
+        }
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

@@ -52,4 +52,25 @@ struct SongRepository: RepositoryProtocol {
     var deleteExpression: Delete {
         return table.filter(id == model!.id!).delete()
     }
+    
+    func getAll(by bookIdentifier: Int64) throws -> [SongViewModel]  {
+        var result = [SongViewModel]()
+        
+        guard let database = SQLiteDataAccessLayer.shared.db else {
+            throw DataAccessError.Datastore_Connection_Error
+        }
+        
+        let bookSongTable = Table(AppConstraints.bookSongTableName)
+        let songFK = Expression<Int64>("songId")
+        let songIndex = Expression<Int64>("songIndex")
+        let bookFK = Expression<Int64>("bookId")
+
+        let query = table.join(bookSongTable, on: songFK == table[id]).select(id, name, songIndex).filter(bookFK == bookIdentifier).order(songIndex.asc)
+        	
+        for row in try database.prepare(query) {
+            result.append(SongViewModel(id: row[id], name: row[name], index: row[songIndex]))
+        }
+        
+        return result
+    }
 }

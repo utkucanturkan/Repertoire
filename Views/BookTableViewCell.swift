@@ -28,7 +28,7 @@ class BookTableViewCell: UITableViewCell {
         }
     }
     
-    func format(date date:Date, as format: String) -> String {
+    func format(date:Date, as format: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         return dateFormatter.string(from: date)

@@ -10,21 +10,19 @@ import UIKit
 
 class BookDetailTableViewController: UITableViewController {
     
-    var model: BookViewModel? {
+    var bookModel: BookViewModel? {
         didSet {
             getSongs()
         }
     }
     
-    private var songs = [SongViewModel]() {
-        didSet {
-            tableView?.reloadData()
-        }
-    }
+    private var songRepository = SongRepository()
+    
+    private var songs = [SongViewModel]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = model?.name
+        self.title = bookModel?.name
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -33,7 +31,17 @@ class BookDetailTableViewController: UITableViewController {
     }
 
     private func getSongs() {
-        
+        if let book = bookModel {
+            if ApplicationUserSession.session!.islocal {
+                do {
+                    songs = try songRepository.getAll(by: book.localId)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            } else {
+                // TODO: get from firebase cloud store
+            }
+        }
     }
     
     // MARK: - Table view data source
@@ -43,6 +51,13 @@ class BookDetailTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if songs.count == 0 {
+            tableView.setEmptyView(title: "You have not any song", message: "A new song can be added by + button on the left corner")
+        } else {
+            tableView.restore()
+        }
+        
         return songs.count
     }
 
@@ -50,7 +65,7 @@ class BookDetailTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.songCellIdentifier, for: indexPath) as! SongTableViewCell
 
-        // Configure the cell...
+        cell.song = songs[indexPath.row]
 
         return cell
     }
@@ -75,20 +90,20 @@ class BookDetailTableViewController: UITableViewController {
     }
     
 
-    /*
+    
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
     }
-    */
+    
 
-    /*
+    
     // Override to support conditional rearranging of the table view.
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
         return true
     }
-    */
+    
 
     /*
     // MARK: - Navigation
