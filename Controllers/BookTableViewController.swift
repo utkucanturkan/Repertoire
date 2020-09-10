@@ -12,7 +12,12 @@ import Firebase
 
 class BookTableViewController: UITableViewController {
 
-    private var model = [BookViewModel]()
+    private var model = [BookViewModel]() {
+        didSet {
+            navigationItem.rightBarButtonItem = !model.isEmpty ? self.editButtonItem : nil
+            navigationItem.searchController = !model.isEmpty ? searchController : nil
+        }
+    }
             
     private var bookRepository = BookRepository()
     
@@ -47,15 +52,12 @@ class BookTableViewController: UITableViewController {
         // SearchController
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search any book of song"
-        navigationItem.searchController = searchController
+        searchController.searchBar.placeholder = "Search a book"
         definesPresentationContext = true
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
     }
     
     @IBAction func addBookButtonTapped(_ sender: UIBarButtonItem) {
@@ -161,7 +163,7 @@ class BookTableViewController: UITableViewController {
 
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        return !model.isEmpty
     }
     
     // Override to support editing the table view.
@@ -183,7 +185,9 @@ class BookTableViewController: UITableViewController {
     }
 }
 
-extension BookTableViewController: UISearchResultsUpdating {
+extension BookTableViewController: UISearchResultsUpdating, UISearchControllerDelegate {
+    
+    
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterModelForSearchText(searchBar.text!)
