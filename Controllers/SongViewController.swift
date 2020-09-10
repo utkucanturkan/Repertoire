@@ -8,14 +8,27 @@
 
 import UIKit
 
-class SongViewController: UIViewController {
+enum songViewControllerMode {
+    case view
+    case edit
+    case add
+}
 
+class SongViewController: UIViewController, UIGestureRecognizerDelegate {
+
+    var mode: songViewControllerMode = .view {
+        didSet {
+            // TODO: run instructions with respect to songMode
+            print(mode)
+        }
+    }
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
     }
-    
 
     /*
     // MARK: - Navigation
@@ -26,5 +39,4 @@ class SongViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
-
 }

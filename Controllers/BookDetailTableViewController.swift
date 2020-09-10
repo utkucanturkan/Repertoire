@@ -16,17 +16,35 @@ class BookDetailTableViewController: UITableViewController {
         }
     }
     
+    private let searchController = UISearchController(searchResultsController: nil)
+    
     private var songRepository = SongRepository()
     
     private var songs = [SongViewModel]() {
         didSet {
             setNavigationItems()
+            navigationItem.searchController = !songs.isEmpty ? searchController : nil
         }
+    }
+    
+    private var filteredSong = [SongViewModel]()
+    
+    
+    private var isSearchBarEmpty: Bool {
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    private var isfiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = bookModel?.name
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search a song"
+        definesPresentationContext = true
         setNavigationItems()
     }
     
@@ -41,9 +59,7 @@ class BookDetailTableViewController: UITableViewController {
     }
     
     @objc func addNewSongButtonTapped() {
-        tableView.restore()
-        let songViewController = SongViewController()
-        self.navigationController?.pushViewController(songViewController, animated: true)
+        performSegue(withIdentifier: AppConstraints.addSongViewControllerIdentifier, sender: nil)
     }
 
     private func getSongs() {
@@ -60,6 +76,13 @@ class BookDetailTableViewController: UITableViewController {
         }
     }
     
+    private func filterModelForSearchText(_ searchText: String) {
+        filteredSong = songs.filter { song in
+            return song.name.lowercased().contains(searchText.lowercased())
+        }
+        tableView.reloadData()
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -67,21 +90,20 @@ class BookDetailTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        if songs.count == 0 {
-            tableView.setEmptyView(title: "You have not any song", message: "A new song can be added by + button on the left corner")
+        let totalDataCount = isfiltering ? filteredSong.count : songs.count
+        if totalDataCount == 0 {
+            tableView.setEmptyView(title: "You have not any song", message: isfiltering ? "" : "A new song can be added by + button on the left corner")
         } else {
             tableView.restore()
         }
-        
-        return songs.count
+        return totalDataCount
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.songCellIdentifier, for: indexPath) as! SongTableViewCell
 
-        cell.song = songs[indexPath.row]
+        cell.song = isfiltering ? filteredSong[indexPath.row] : songs[indexPath.row]
 
         return cell
     }
@@ -98,11 +120,12 @@ class BookDetailTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+            let deletedSong = isfiltering ? filteredSong[indexPath.row] : songs[indexPath.row]
+            
+            // TODO: delete song from db and model even if filtering is active
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
     
 
@@ -117,18 +140,31 @@ class BookDetailTableViewController: UITableViewController {
     // Override to support conditional rearranging of the table view.
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-        return true
+        return !isfiltering
     }
     
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        switch segue.identifier {
+        case AppConstraints.addSongViewControllerIdentifier:
+            if let svc = segue.destination as? SongViewController {
+                svc.mode = .add
+            }
+        default:
+            break
+        }
     }
-    */
+    
 
+}
+
+extension BookDetailTableViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterModelForSearchText(searchBar.text!)
+    }
 }

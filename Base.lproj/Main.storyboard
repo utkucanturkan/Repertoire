@@ -271,7 +271,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="name" destination="8zH-OU-Cgx" id="rvr-8D-xS5"/>
-                                    <segue destination="Flb-dX-R2d" kind="show" id="BGh-Ms-xAF"/>
+                                    <segue destination="Flb-dX-R2d" kind="show" identifier="addSongSegue" id="BGh-Ms-xAF"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -281,6 +281,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="oA5-eh-EmY"/>
+                    <connections>
+                        <segue destination="Flb-dX-R2d" kind="show" id="MPF-mN-wSz"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f5w-mK-SqG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -390,6 +393,9 @@
             <point key="canvasLocation" x="1299" y="-98"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="BGh-Ms-xAF"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <image name="book" catalog="system" width="128" height="101"/>
         <image name="bookmark" catalog="system" width="112" height="128"/>

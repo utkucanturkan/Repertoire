@@ -24,11 +24,7 @@ class BookTableViewController: UITableViewController {
     // MARK: Searching
     private let searchController = UISearchController(searchResultsController: nil)
     
-    private var filteredModel = [BookViewModel]() {
-        didSet {
-            tableView?.reloadData()
-        }
-    }
+    private var filteredModel = [BookViewModel]()
     
     private var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
@@ -105,9 +101,10 @@ class BookTableViewController: UITableViewController {
     }
     
     private func filterModelForSearchText(_ searchText: String) {
-        filteredModel = model.filter { (book) in
+        filteredModel = model.filter { book in
             return book.name.lowercased().contains(searchText.lowercased())
         }
+        tableView.reloadData()
     }
     
     private func deleteBook(_ bookViewModel: BookViewModel) {
@@ -169,7 +166,10 @@ class BookTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let deletedBook = model.remove(at: indexPath.row)
+            let deletedBook = isfiltering ? filteredModel.remove(at: indexPath.row) : model.remove(at: indexPath.row)
+            
+            // TODO: delete also model if filtering is active
+            
             deleteBook(deletedBook)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }

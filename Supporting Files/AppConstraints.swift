@@ -25,6 +25,7 @@ struct AppConstraints {
     // Segue Identifiers
     static let bookViewControllerSegueIdentifier = "BookViewControllerSegue"
     static let bookDetailViewControllerSegueIdentifier = "BookDetailSegue"
+    static let addSongViewControllerIdentifier = "addSongSegue"
     
     // Local Database
     static let defaultLocalUserName = "localUser"
