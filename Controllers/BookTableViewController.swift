@@ -71,7 +71,7 @@ class BookTableViewController: UITableViewController {
         
         alert.addAction(UIAlertAction(title: "Save", style: .default) { [unowned self] action in
             guard let newBookName = alert.textFields?.first?.text else { return }
-            if !newBookName.isEmpty {
+            if newBookName.isValid {
                 if let newBookIds = self.addNewBook(with: newBookName) {
                     let newBookViewmodel = BookViewModel(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
                     self.model.append(newBookViewmodel)
@@ -186,10 +186,14 @@ class BookTableViewController: UITableViewController {
 }
 
 extension BookTableViewController: UISearchResultsUpdating, UISearchControllerDelegate {
-    
-    
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterModelForSearchText(searchBar.text!)
+    }
+}
+
+extension String {
+    var isValid: Bool {
+        return !self.isEmpty && !self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

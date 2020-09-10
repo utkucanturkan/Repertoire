@@ -18,23 +18,39 @@ class BookDetailTableViewController: UITableViewController {
     
     private var songRepository = SongRepository()
     
-    private var songs = [SongViewModel]()
+    private var songs = [SongViewModel]() {
+        didSet {
+            setNavigationItems()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = bookModel?.name
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
+        setNavigationItems()
+    }
+    
+    private func setNavigationItems() {
+        let newSongBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewSongButtonTapped))
+        self.navigationItem.rightBarButtonItems = [newSongBarButton]
+        if !songs.isEmpty {
+            if self.navigationItem.rightBarButtonItems != nil {
+                self.navigationItem.rightBarButtonItems!.append(self.editButtonItem)
+            }
+        }
+    }
+    
+    @objc func addNewSongButtonTapped() {
+        tableView.restore()
+        let songViewController = SongViewController()
+        self.navigationController?.pushViewController(songViewController, animated: true)
     }
 
     private func getSongs() {
         if let book = bookModel {
             if ApplicationUserSession.session!.islocal {
                 do {
-                    songs = try songRepository.getAll(by: book.localId)
+                    //songs = try songRepository.getAll(by: book.localId)
                 } catch {
                     print(error.localizedDescription)
                 }
