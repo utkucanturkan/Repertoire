@@ -167,9 +167,15 @@ class BookTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let deletedBook = isfiltering ? filteredModel.remove(at: indexPath.row) : model.remove(at: indexPath.row)
-            
-            // TODO: delete also model if filtering is active
-            
+            if isfiltering {
+                var itemIndex = 0
+                for item in model {
+                    if item.localId == deletedBook.localId {
+                        model.remove(at: itemIndex)
+                    }
+                    itemIndex += 1
+                }
+            }
             deleteBook(deletedBook)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }

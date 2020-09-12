@@ -23,11 +23,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
+    private var songNameTextField: UITextField {
+        return UITextField(frame: CGRect)
+    }
     
+    private var songContentTextView: UITextView {
+        return UITextView(frame: CGRect)
+    }
+    
+    private var scrollView: UIScrollView {
+        return UIScrollView(frame: self.view.frame)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.view.addSubview(scrollView)
     }
 
     /*

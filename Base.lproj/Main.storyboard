@@ -33,26 +33,26 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="hRY-x9-ygO">
-                                <rect key="frame" x="85" y="753" width="244" height="109"/>
+                                <rect key="frame" x="85" y="662" width="244" height="200"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hax-Vt-XtO" customClass="FBSDKLoginButton">
-                                        <rect key="frame" x="0.0" y="0.0" width="244" height="16.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="244" height="30"/>
                                     </button>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nPf-ux-Stl" customClass="GIDSignInButton">
-                                        <rect key="frame" x="0.0" y="36.5" width="244" height="0.0"/>
+                                        <rect key="frame" x="0.0" y="50" width="244" height="50"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <connections>
                                             <action selector="googleSignInPressed:" destination="DUk-DY-q7p" eventType="valueChanged" id="ilP-l9-STV"/>
                                         </connections>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyb-mu-j6u">
-                                        <rect key="frame" x="0.0" y="56.5" width="244" height="16"/>
+                                        <rect key="frame" x="0.0" y="120" width="244" height="30"/>
                                         <state key="normal" title="Advantages of becoming a member">
                                             <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GFh-Sw-VTN">
-                                        <rect key="frame" x="47" y="92.5" width="150" height="16.5"/>
+                                        <rect key="frame" x="47" y="170" width="150" height="30"/>
                                         <state key="normal" title="Terms and Conditions">
                                             <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
@@ -271,7 +271,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="name" destination="8zH-OU-Cgx" id="rvr-8D-xS5"/>
-                                    <segue destination="Flb-dX-R2d" kind="show" identifier="addSongSegue" id="BGh-Ms-xAF"/>
+                                    <segue destination="Flb-dX-R2d" kind="show" identifier="viewSongSegue" id="BGh-Ms-xAF"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -282,7 +282,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" id="oA5-eh-EmY"/>
                     <connections>
-                        <segue destination="Flb-dX-R2d" kind="show" id="MPF-mN-wSz"/>
+                        <segue destination="Flb-dX-R2d" kind="show" identifier="addSongSegue" id="MPF-mN-wSz"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f5w-mK-SqG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -296,26 +296,14 @@
                     <view key="view" contentMode="scaleToFill" id="ZSo-9o-0th">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SongViewController" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JB5-VA-yre">
-                                <rect key="frame" x="131" y="437.5" width="152" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <constraints>
-                            <constraint firstItem="JB5-VA-yre" firstAttribute="centerX" secondItem="ZSo-9o-0th" secondAttribute="centerX" id="E5y-He-Yyy"/>
-                            <constraint firstItem="JB5-VA-yre" firstAttribute="centerY" secondItem="ZSo-9o-0th" secondAttribute="centerY" id="wMi-dc-W7p"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="A1j-6f-FYb"/>
                     </view>
                     <navigationItem key="navigationItem" id="hKQ-kk-HFu"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T6v-xU-aoD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4041" y="-812"/>
+            <point key="canvasLocation" x="4040.579710144928" y="-812.27678571428567"/>
         </scene>
         <!--Book-->
         <scene sceneID="9v0-LN-5sx">

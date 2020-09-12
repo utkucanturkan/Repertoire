@@ -65,7 +65,10 @@ struct SongRepository: RepositoryProtocol {
         let songIndex = Expression<Int64>("songIndex")
         let bookFK = Expression<Int64>("bookId")
 
-        let query = table.join(bookSongTable, on: songFK == table[id]).select(id, name, songIndex).filter(bookFK == bookIdentifier).order(songIndex.asc)
+        let query = table.join(bookSongTable, on: table[id] == bookSongTable[songFK])
+            .select(table[id], name, songIndex, bookFK)
+            .filter(bookFK == bookIdentifier)
+            .order(songIndex.asc)
         	
         for row in try database.prepare(query) {
             result.append(SongViewModel(id: row[id], name: row[name], index: row[songIndex]))
