@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct BookSong: EntityProtocol {
+struct BookSongEntity: BaseEntity {
     
     // Primary-key
     var id: Int64?

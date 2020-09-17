@@ -16,7 +16,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     @IBOutlet weak var facebookLoginButton: FBLoginButton!
         
     @IBAction func skipSignIn(_ sender: UIButton) {
-        saveUserLocalDatabase(user: User())
+        saveUserLocalDatabase(user: UserEntity())
         self.performSegue(withIdentifier: AppConstraints.bookViewControllerSegueIdentifier, sender: sender)
     }
     
@@ -61,7 +61,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
                 print(error.localizedDescription)
             } else {
                 if let currentUser = Auth.auth().currentUser {
-                    self.saveUserLocalDatabase(user: User(globalId: currentUser.uid, name: currentUser.displayName ?? currentUser.uid))
+                    self.saveUserLocalDatabase(user: UserEntity(globalId: currentUser.uid, name: currentUser.displayName ?? currentUser.uid))
                     self.performSegue(withIdentifier: AppConstraints.bookViewControllerSegueIdentifier, sender: self)
                 }
             }
@@ -76,7 +76,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         }
     }
     
-    private func initializeUserSession(with localId: Int64, of user: User) {
+    private func initializeUserSession(with localId: Int64, of user: UserEntity) {
         do {
             let userSession = ApplicationUserSession(localId: localId, globalId: user.globalId, userName: user.name)
             try UserDefaults.standard.setEncodable(object: userSession, with: AppConstraints.userSessionKey)
@@ -85,7 +85,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
         }
     }
     
-    private func saveUserLocalDatabase(user: User) {
+    private func saveUserLocalDatabase(user: UserEntity) {
         var userRepository = UserRepository()
         do {
             let userLocalId = try userRepository.insert(element: user)

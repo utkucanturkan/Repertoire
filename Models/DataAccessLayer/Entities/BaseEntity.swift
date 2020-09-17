@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol EntityProtocol {
+protocol BaseEntity {
     var id: Int64? { get set }
 }

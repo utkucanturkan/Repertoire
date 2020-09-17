@@ -86,7 +86,7 @@ class BookTableViewController: UITableViewController {
         var newAddedBook: (localId: Int64, globalId: String?)
         newAddedBook.globalId = nil
         do {
-            let book = Book(userId: ApplicationUserSession.session!.localId, name: name)
+            let book = BookEntity(userId: ApplicationUserSession.session!.localId, name: name)
             newAddedBook.localId = try bookRepository.insert(element: book)
             if !ApplicationUserSession.session!.islocal {
                 
@@ -109,7 +109,7 @@ class BookTableViewController: UITableViewController {
     
     private func deleteBook(_ bookViewModel: BookViewModel) {
         do {
-            let deletedBook = Book(id: bookViewModel.localId, userId: ApplicationUserSession.session!.localId, name: bookViewModel.name)
+            let deletedBook = BookEntity(id: bookViewModel.localId, userId: ApplicationUserSession.session!.localId, name: bookViewModel.name)
             try bookRepository.delete(element: deletedBook)
             if !ApplicationUserSession.session!.islocal {
                 

@@ -9,15 +9,6 @@
 import Foundation
 import SQLite
 
-enum DataAccessError: Error {
-    case Datastore_Connection_Error
-    case Insert_Error
-    case Delete_Error
-    case Update_Error
-    case Search_Error
-    case Nil_In_Data
-}
-
 struct SQLiteDataAccessLayer {
     static let shared = SQLiteDataAccessLayer()
     
@@ -28,7 +19,6 @@ struct SQLiteDataAccessLayer {
     private init() {
         do {
             db = try Connection(dbPath)
-            print(AppConstraints.databasePath)
         } catch _ {
             db = nil
         }

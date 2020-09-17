@@ -1,5 +1,5 @@
 //
-//  BookEntity.swift
+//  SongEntity.swift
 //  Repertoire
 //
 //  Created by Utkucan Türkan on 30.08.2020.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Book: EntityProtocol {
+struct SongEntity: BaseEntity {
     
     // Primary-key
     var id: Int64?
@@ -18,5 +18,7 @@ struct Book: EntityProtocol {
     
     // Fields
     var name: String
+    var content: String
+    var mediaUrl: String
     var status: Bool = true
 }

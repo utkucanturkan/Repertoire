@@ -20,7 +20,7 @@ extension InitializableRepository {
 }
 
 protocol RepositoryProtocol: InitializableRepository {
-    associatedtype Entity: EntityProtocol
+    associatedtype entityType: BaseEntity
 
     var insertExpression: Insert { get }
     var deleteExpression: Delete { get }
@@ -28,16 +28,13 @@ protocol RepositoryProtocol: InitializableRepository {
     
     var tableName: String { get }
     
-    var model: Entity? { get set }
+    var entity: entityType? { get set }
 }
 
 extension RepositoryProtocol {
     var id: Expression<Int64> { return Expression<Int64>("id") }
-    
     var created: Expression<Date> { return Expression<Date>("created") }
-    
     var updated: Expression<Date?> { return Expression<Date?>("updated") }
-    
     var status: Expression<Bool> { return Expression<Bool>("status") }
     
     var table: Table {
@@ -45,28 +42,24 @@ extension RepositoryProtocol {
     }
 
     // CRUD
-    mutating func insert(element: Entity) throws -> Int64 {
-        model = element
+    mutating func insert(element: entityType) throws -> Int64 {
+        entity = element
         return try SQLiteDataAccessLayer.shared.insert(expression: insertExpression)
     }
     
-    mutating func delete(element: Entity) throws {
-        model = element
-        
+    mutating func delete(element: entityType) throws {
+        entity = element
         guard let _ = element.id else {
             throw DataAccessError.Nil_In_Data
         }
-        
         try SQLiteDataAccessLayer.shared.delete(expression: deleteExpression)
     }
     
-    mutating func update(element: Entity) throws {
-        model = element
-        
+    mutating func update(element: entityType) throws {
+        entity = element
         guard let _ = element.id else {
             throw DataAccessError.Nil_In_Data
         }
-        
         try SQLiteDataAccessLayer.shared.update(expression: updateExpression)
     }
 }

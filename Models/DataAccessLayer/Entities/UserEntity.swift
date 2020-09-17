@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct User: EntityProtocol {
+struct UserEntity: BaseEntity {
     
     // Primary-key
     var id: Int64?

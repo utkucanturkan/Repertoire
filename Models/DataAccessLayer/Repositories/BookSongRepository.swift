@@ -10,9 +10,9 @@ import Foundation
 import SQLite
 
 struct BookSongRepository: RepositoryProtocol {
-    typealias Entity = BookSong
+    typealias entityType = BookSongEntity
     
-    var model: BookSong?
+    var entity: BookSongEntity?
     
     // Expressions
     let bookFK = Expression<Int64>("bookId")
@@ -39,15 +39,15 @@ struct BookSongRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(bookFK <- model!.bookId, songFK <- model!.songId, songIndex <- model!.songIndex)
+        return table.insert(bookFK <- entity!.bookId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
     }
             
     var deleteExpression: Delete {
-        return table.filter(id == model!.id!).delete()
+        return table.filter(id == entity!.id!).delete()
     }
     
     var updateExpression: Update {
-        return table.filter(id == model!.id!).update(bookFK <- model!.bookId, songFK <- model!.songId, songIndex <- model!.songIndex)
+        return table.filter(id == entity!.id!).update(bookFK <- entity!.bookId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
     }
     
     func getTotalSongCount(by bookIdentifier: Int64) throws -> Int {

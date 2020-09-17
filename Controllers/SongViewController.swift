@@ -22,7 +22,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate {
             print(mode)
         }
     }
-    
+    /*
     private var songNameTextField: UITextField {
         return UITextField(frame: CGRect)
     }
@@ -34,10 +34,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate {
     private var scrollView: UIScrollView {
         return UIScrollView(frame: self.view.frame)
     }
-    
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubview(scrollView)
+        //self.view.addSubview(scrollView)
     }
 
     /*

@@ -10,9 +10,9 @@ import Foundation
 import SQLite
 
 struct BookRepository: RepositoryProtocol {
-    var model: Book?
+    var entity: BookEntity?
     
-    typealias Entity = Book
+    typealias entityType = BookEntity
     
     // Expressions
     let name = Expression<String>("name")
@@ -41,18 +41,18 @@ struct BookRepository: RepositoryProtocol {
         
         // TODO: check whether the new model name is already existed or not
         
-        return table.insert(name <- model!.name, userFK <- model!.userId, status <- model!.status)
+        return table.insert(name <- entity!.name, userFK <- entity!.userId, status <- entity!.status)
     }
 
     var updateExpression: Update {
         
         // TODO: check whether the updating model name is already existed or not
         
-        return table.filter(id == model!.id!).update(name <- model!.name, status <- model!.status)
+        return table.filter(id == entity!.id!).update(name <- entity!.name, status <- entity!.status)
     }
  
     var deleteExpression: Delete {
-        return table.filter(id == model!.id!).delete()
+        return table.filter(id == entity!.id!).delete()
     }
     
     
