@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct BookViewModel {
+struct Book {
     var localId: Int64
     var globalId: String?
     var name: String

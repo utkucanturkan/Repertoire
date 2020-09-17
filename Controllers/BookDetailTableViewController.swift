@@ -10,7 +10,7 @@ import UIKit
 
 class BookDetailTableViewController: UITableViewController {
     
-    var bookModel: BookViewModel? {
+    var book: Book? {
         didSet {
             getSongs()
         }
@@ -20,14 +20,14 @@ class BookDetailTableViewController: UITableViewController {
     
     private var songRepository = SongRepository()
     
-    private var songs = [SongViewModel]() {
+    private var songs = [Song]() {
         didSet {
             setNavigationItems()
             navigationItem.searchController = !songs.isEmpty ? searchController : nil
         }
     }
     
-    private var filteredSong = [SongViewModel]()
+    private var filteredSong = [Song]()
     
     private var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
@@ -39,7 +39,7 @@ class BookDetailTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = bookModel?.name
+        self.title = book?.name
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search a song"
@@ -62,7 +62,7 @@ class BookDetailTableViewController: UITableViewController {
     }
 
     private func getSongs() {
-        if let book = bookModel {
+        if let book = book {
             if ApplicationUserSession.session!.islocal {
                 do {
                     songs = try songRepository.getAll(by: book.localId)
@@ -75,7 +75,7 @@ class BookDetailTableViewController: UITableViewController {
         }
     }
     
-    private func deleteSong(_ songViewModel: SongViewModel) {
+    private func deleteSong(_ songViewModel: Song) {
         do {
             // let song = Song(id: songViewModel.id, userId: ApplicationUserSession.session!.localId, name: songViewModel.name, content: songViewModel, mediaUrl: <#T##String#>, status: <#T##Bool#>)
             // try songRepository.delete(element: song)

@@ -88,8 +88,8 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     private func saveUserLocalDatabase(user: UserEntity) {
         var userRepository = UserRepository()
         do {
-            let userLocalId = try userRepository.insert(element: user)
-            initializeUserSession(with: userLocalId, of: user)
+            let newUserId = try userRepository.insert(element: user)
+            initializeUserSession(with: newUserId, of: user)
             logOut()             // to remove the information of the firebase auth from the keychain
         } catch {
             print(error.localizedDescription)

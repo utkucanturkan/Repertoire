@@ -12,10 +12,10 @@ import Firebase
 
 class BookTableViewController: UITableViewController {
 
-    private var model = [BookViewModel]() {
+    private var books = [Book]() {
         didSet {
-            navigationItem.rightBarButtonItem = !model.isEmpty ? self.editButtonItem : nil
-            navigationItem.searchController = !model.isEmpty ? searchController : nil
+            navigationItem.rightBarButtonItem = !books.isEmpty ? self.editButtonItem : nil
+            navigationItem.searchController = !books.isEmpty ? searchController : nil
         }
     }
             
@@ -24,7 +24,7 @@ class BookTableViewController: UITableViewController {
     // MARK: Searching
     private let searchController = UISearchController(searchResultsController: nil)
     
-    private var filteredModel = [BookViewModel]()
+    private var filteredBooks = [Book]()
     
     private var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
@@ -69,11 +69,11 @@ class BookTableViewController: UITableViewController {
             guard let newBookName = alert.textFields?.first?.text else { return }
             if newBookName.isValid {
                 if let newBookIds = self.addNewBook(with: newBookName) {
-                    let newBookViewmodel = BookViewModel(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
-                    self.model.append(newBookViewmodel)
+                    let newBook = Book(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
+                    self.books.append(newBook)
                     self.tableView.reloadData()
                     let bdvc = BookDetailTableViewController()
-                    bdvc.bookModel = newBookViewmodel
+                    bdvc.book = newBook
                     self.navigationController?.pushViewController(bdvc, animated: true)
                 }
             }
@@ -86,8 +86,8 @@ class BookTableViewController: UITableViewController {
         var newAddedBook: (localId: Int64, globalId: String?)
         newAddedBook.globalId = nil
         do {
-            let book = BookEntity(userId: ApplicationUserSession.session!.localId, name: name)
-            newAddedBook.localId = try bookRepository.insert(element: book)
+            let bookEntity = BookEntity(userId: ApplicationUserSession.session!.localId, name: name)
+            newAddedBook.localId = try bookRepository.insert(element: bookEntity)
             if !ApplicationUserSession.session!.islocal {
                 
                 // TODO: add a new book into the firebase cloud store, and set the globalId property of the newly added book
@@ -101,16 +101,16 @@ class BookTableViewController: UITableViewController {
     }
     
     private func filterModelForSearchText(_ searchText: String) {
-        filteredModel = model.filter { book in
+        filteredBooks = books.filter { book in
             return book.name.lowercased().contains(searchText.lowercased())
         }
         tableView.reloadData()
     }
     
-    private func deleteBook(_ bookViewModel: BookViewModel) {
+    private func deleteBook(_ book: Book) {
         do {
-            let deletedBook = BookEntity(id: bookViewModel.localId, userId: ApplicationUserSession.session!.localId, name: bookViewModel.name)
-            try bookRepository.delete(element: deletedBook)
+            let deletedBookEntity = BookEntity(id: book.localId, userId: ApplicationUserSession.session!.localId, name: book.name)
+            try bookRepository.delete(element: deletedBookEntity)
             if !ApplicationUserSession.session!.islocal {
                 
                 // TODO: delete book from firebase cloud store
@@ -124,7 +124,7 @@ class BookTableViewController: UITableViewController {
     private func getBooksOfCurrentUser() {
         if ApplicationUserSession.session!.islocal {
             do {
-                model = try bookRepository.getAllBy(userIdentifier: ApplicationUserSession.session!.localId)
+                books = try bookRepository.getAllBy(userIdentifier: ApplicationUserSession.session!.localId)
                 tableView.reloadData()
             } catch {
                 print(error.localizedDescription)
@@ -142,7 +142,7 @@ class BookTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let totalDataCount = isfiltering ? filteredModel.count : model.count
+        let totalDataCount = isfiltering ? filteredBooks.count : books.count
         if totalDataCount == 0 {
             tableView.setEmptyView(title: "You have not any song book", message: isfiltering ? "" : "A new book can be added by + button on the left corner")
         } else {
@@ -153,25 +153,24 @@ class BookTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.bookCellIdentifier, for: indexPath) as! BookTableViewCell
-        let book = isfiltering ? filteredModel[indexPath.row] : model[indexPath.row]
-        cell.model = book
+        cell.book = isfiltering ? filteredBooks[indexPath.row] : books[indexPath.row]
         return cell
     }
 
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return !model.isEmpty
+        return !books.isEmpty
     }
     
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let deletedBook = isfiltering ? filteredModel.remove(at: indexPath.row) : model.remove(at: indexPath.row)
+            let deletedBook = isfiltering ? filteredBooks.remove(at: indexPath.row) : books.remove(at: indexPath.row)
             if isfiltering {
                 var itemIndex = 0
-                for item in model {
+                for item in books {
                     if item.localId == deletedBook.localId {
-                        model.remove(at: itemIndex)
+                        books.remove(at: itemIndex)
                     }
                     itemIndex += 1
                 }
@@ -185,7 +184,7 @@ class BookTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
             if let bdvc = segue.destination as? BookDetailTableViewController, let bcv = sender as? BookTableViewCell {
-                bdvc.bookModel = bcv.model
+                bdvc.book = bcv.book
             }
         }
     }

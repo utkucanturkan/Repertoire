@@ -53,8 +53,8 @@ struct SongRepository: RepositoryProtocol {
         return table.filter(id == entity!.id!).delete()
     }
     
-    func getAll(by bookIdentifier: Int64) throws -> [SongViewModel]  {
-        var result = [SongViewModel]()
+    func getAll(by bookIdentifier: Int64) throws -> [Song]  {
+        var result = [Song]()
         
         guard let database = SQLiteDataAccessLayer.shared.db else {
             throw DataAccessError.Datastore_Connection_Error
@@ -71,7 +71,7 @@ struct SongRepository: RepositoryProtocol {
             .order(songIndex.asc)
         	
         for row in try database.prepare(query) {
-            result.append(SongViewModel(id: row[id], name: row[name], index: row[songIndex]))
+            result.append(Song(id: row[id], name: row[name], index: row[songIndex]))
         }
         
         return result
