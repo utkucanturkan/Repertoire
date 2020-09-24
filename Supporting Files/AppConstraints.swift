@@ -21,6 +21,7 @@ struct AppConstraints {
     // Cell Identifiers
     static let bookCellIdentifier = "bookCell"
     static let songCellIdentifier = "songCell"
+    static let addSongCellIdentifier = "addNewSongCell"
     
     // Segue Identifiers
     static let bookViewControllerSegueIdentifier = "BookViewControllerSegue"

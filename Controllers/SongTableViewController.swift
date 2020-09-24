@@ -8,13 +8,16 @@
 
 import UIKit
 
-class BookDetailTableViewController: UITableViewController {
+enum songTableViewMode {
+    case list
+    case add
+}
+
+class SongTableViewController: UITableViewController {
     
-    var book: Book? {
-        didSet {
-            getSongs()
-        }
-    }
+    var book: Book?
+    
+    var mode: songTableViewMode = .list
     
     private let searchController = UISearchController(searchResultsController: nil)
     
@@ -22,7 +25,7 @@ class BookDetailTableViewController: UITableViewController {
     
     private var songs = [Song]() {
         didSet {
-            setNavigationItems()
+            setNavigationBarButtonItems()
             navigationItem.searchController = !songs.isEmpty ? searchController : nil
         }
     }
@@ -39,17 +42,36 @@ class BookDetailTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = book?.name
+        setTitle()
+        
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search a song"
         definesPresentationContext = true
-        setNavigationItems()
+        
+        setNavigationBarButtonItems()
+        getSongs()
     }
     
-    private func setNavigationItems() {
-        let newSongBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewSongButtonTapped))
-        self.navigationItem.rightBarButtonItems = [newSongBarButton]
+    private func setTitle() {
+        self.title = (book != nil && mode == .list) ? "\(book!.name) Songs" : "All Songs"
+    }
+    
+    // MARK: Navigation Bar Button Items
+    private func setNavigationBarButtonItems() {
+        setRightBarButtonItems()
+        setLeftBarButtonItems()
+    }
+    
+    private func setLeftBarButtonItems() {
+        self.navigationItem.leftItemsSupplementBackButton = true
+        if mode != .add {
+            let addNewSongBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewSongBarButtonTapped))
+            self.navigationItem.leftBarButtonItem = addNewSongBarButton
+        }
+    }
+    
+    private func setRightBarButtonItems() {
         if !songs.isEmpty {
             if self.navigationItem.rightBarButtonItems != nil {
                 self.navigationItem.rightBarButtonItems!.append(self.editButtonItem)
@@ -57,21 +79,29 @@ class BookDetailTableViewController: UITableViewController {
         }
     }
     
-    @objc func addNewSongButtonTapped() {
-        performSegue(withIdentifier: AppConstraints.addSongViewControllerIdentifier, sender: nil)
-    }
-
-    private func getSongs() {
+    @objc func addNewSongBarButtonTapped() {
         if let book = book {
-            if ApplicationUserSession.session!.islocal {
-                do {
-                    songs = try songRepository.getAll(by: book.localId)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            } else {
-                // TODO: get from firebase cloud store
+            let stvc = SongTableViewController()
+            stvc.book = book
+            stvc.mode = .add
+            self.navigationController?.pushViewController(stvc, animated: true)
+        } else {
+            let svc = SongViewController()
+            svc.mode = .add
+            self.navigationController?.pushViewController(svc, animated: true)
+        }
+    }
+    
+    private func getSongs() {
+        let bookIdentifier = mode == .add ? nil : book?.localId
+        if ApplicationUserSession.session!.islocal {
+            do {
+                songs = try songRepository.getAll(bookIdentifier)
+            } catch {
+                print(error.localizedDescription)
             }
+        } else {
+            // TODO: get from firebase cloud store
         }
     }
     
@@ -166,7 +196,7 @@ class BookDetailTableViewController: UITableViewController {
     }
 }
 
-extension BookDetailTableViewController: UISearchResultsUpdating {
+extension SongTableViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterModelForSearchText(searchBar.text!)

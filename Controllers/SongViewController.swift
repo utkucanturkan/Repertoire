@@ -14,7 +14,7 @@ enum songViewControllerMode {
     case add
 }
 
-class SongViewController: UIViewController, UITextViewDelegate {
+class SongViewController: UIViewController {
 
     var mode: songViewControllerMode = .view {
         didSet {
@@ -33,7 +33,6 @@ class SongViewController: UIViewController, UITextViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        songNameTextView.delegate = self
     }
     
     private func updateUI() {

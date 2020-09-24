@@ -72,7 +72,7 @@ class BookTableViewController: UITableViewController {
                     let newBook = Book(localId: newBookIds.localId, globalId: newBookIds.globalId, name: newBookName)
                     self.books.append(newBook)
                     self.tableView.reloadData()
-                    let bdvc = BookDetailTableViewController()
+                    let bdvc = SongTableViewController()
                     bdvc.book = newBook
                     self.navigationController?.pushViewController(bdvc, animated: true)
                 }
@@ -183,7 +183,7 @@ class BookTableViewController: UITableViewController {
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
-            if let bdvc = segue.destination as? BookDetailTableViewController, let bcv = sender as? BookTableViewCell {
+            if let bdvc = segue.destination as? SongTableViewController, let bcv = sender as? BookTableViewCell {
                 bdvc.book = bcv.book
             }
         }
