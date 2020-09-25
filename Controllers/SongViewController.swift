@@ -61,7 +61,7 @@ class SongViewController: UIViewController, UITextViewDelegate {
         songContentTextView.frame = CGRect(x: 0, y: 0, width: self.view.safeAreaLayoutGuide.layoutFrame.width, height: 0)
         songContentTextView.delegate = self
         songContentTextView.text = self.mode == .add ? AppConstraints.songContentTextViewPlaceholder : song?.content
-        songContentTextView.textColor = .gray
+        songContentTextView.textColor = .lightGray
         songContentTextView.isEditable = mode != .view
         songContentTextView.backgroundColor = .brown
         songContentTextView.font = UIFont.systemFont(ofSize: 50)
