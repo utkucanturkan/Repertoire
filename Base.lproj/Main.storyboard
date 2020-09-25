@@ -35,26 +35,26 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="hRY-x9-ygO">
-                                <rect key="frame" x="85" y="753" width="244" height="109"/>
+                                <rect key="frame" x="85" y="662" width="244" height="200"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hax-Vt-XtO" customClass="FBSDKLoginButton">
-                                        <rect key="frame" x="0.0" y="0.0" width="244" height="16.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="244" height="30"/>
                                     </button>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nPf-ux-Stl" customClass="GIDSignInButton">
-                                        <rect key="frame" x="0.0" y="36.5" width="244" height="0.0"/>
+                                        <rect key="frame" x="0.0" y="50" width="244" height="50"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <connections>
                                             <action selector="googleSignInPressed:" destination="DUk-DY-q7p" eventType="valueChanged" id="ilP-l9-STV"/>
                                         </connections>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyb-mu-j6u">
-                                        <rect key="frame" x="0.0" y="56.5" width="244" height="16"/>
+                                        <rect key="frame" x="0.0" y="120" width="244" height="30"/>
                                         <state key="normal" title="Advantages of becoming a member">
                                             <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GFh-Sw-VTN">
-                                        <rect key="frame" x="47" y="92.5" width="150" height="16.5"/>
+                                        <rect key="frame" x="47" y="170" width="150" height="30"/>
                                         <state key="normal" title="Terms and Conditions">
                                             <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
@@ -246,7 +246,7 @@
         <!--Song Table View Controller-->
         <scene sceneID="nws-G5-nJO">
             <objects>
-                <tableViewController id="ews-0q-y2T" customClass="SongTableViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="SongTableViewController" id="ews-0q-y2T" customClass="SongTableViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="EX8-Cs-HeA">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -292,7 +292,7 @@
         <!--Song View Controller-->
         <scene sceneID="ka1-Px-VUJ">
             <objects>
-                <viewController id="Flb-dX-R2d" customClass="SongViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SongViewController" id="Flb-dX-R2d" customClass="SongViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ZSo-9o-0th">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

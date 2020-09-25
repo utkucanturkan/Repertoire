@@ -80,15 +80,18 @@ class SongTableViewController: UITableViewController {
     }
     
     @objc func addNewSongBarButtonTapped() {
+        let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
         if let book = book {
-            let stvc = SongTableViewController()
-            stvc.book = book
-            stvc.mode = .add
-            self.navigationController?.pushViewController(stvc, animated: true)
+            if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
+                stvc.book = book
+                stvc.mode = .add
+                self.navigationController?.pushViewController(stvc, animated: true)
+            }
         } else {
-            let svc = SongViewController()
-            svc.mode = .add
-            self.navigationController?.pushViewController(svc, animated: true)
+            if let svc = storyboard.instantiateViewController(identifier: AppConstraints.songViewControllerStoryboardId) as? SongViewController {
+                svc.mode = .add
+                self.navigationController?.pushViewController(svc, animated: true)
+            }
         }
     }
     

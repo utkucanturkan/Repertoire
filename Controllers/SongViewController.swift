@@ -14,18 +14,16 @@ enum songViewControllerMode {
     case add
 }
 
-class SongViewController: UIViewController {
+class SongViewController: UIViewController, UITextViewDelegate {
 
     var mode: songViewControllerMode = .view {
         didSet {
             // TODO: run instructions with respect to songMode
-            updateUI()
+            initializeUIs()
         }
     }
     
     var song: Song?
-    
-    let LOREM_IPSUM = "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32."
     
     private var scrollView = UIScrollView()
     private var songNameTextView = UITextView()
@@ -33,17 +31,26 @@ class SongViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "SongViewController"
+        NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
+
+    @objc func rotated() {
+        scrollView.updateContentSizeHeight()
+    }
+
     
-    private func updateUI() {
+    private func initializeUIs() {
         scrollView.clearSubViews()
-        
-        // Initialize ScrollView
+        scrollView.frame = self.view.safeAreaLayoutGuide.layoutFrame
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         
         // Initialize SongNameTextView
         songNameTextView.frame = CGRect(x: 0, y: 0, width: self.view.safeAreaLayoutGuide.layoutFrame.width, height: 0)
-        songNameTextView.text = self.mode == .add ? LOREM_IPSUM : song?.name
+        songNameTextView.delegate = self
+        songNameTextView.text = self.mode == .add ? AppConstraints.songNameTextViewPlaceholder : song?.name
+        songNameTextView.textColor = .gray
+        songNameTextView.isEditable = mode != .view
         songNameTextView.backgroundColor = .orange
         songNameTextView.font = UIFont.systemFont(ofSize: 50)
         songNameTextView.isScrollEnabled = false
@@ -52,7 +59,10 @@ class SongViewController: UIViewController {
         
         // Initialize SongContentTextView
         songContentTextView.frame = CGRect(x: 0, y: 0, width: self.view.safeAreaLayoutGuide.layoutFrame.width, height: 0)
-        songContentTextView.text = self.mode == .add ? LOREM_IPSUM : song?.content
+        songContentTextView.delegate = self
+        songContentTextView.text = self.mode == .add ? AppConstraints.songContentTextViewPlaceholder : song?.content
+        songContentTextView.textColor = .gray
+        songContentTextView.isEditable = mode != .view
         songContentTextView.backgroundColor = .brown
         songContentTextView.font = UIFont.systemFont(ofSize: 50)
         songContentTextView.isScrollEnabled = false
@@ -81,11 +91,22 @@ class SongViewController: UIViewController {
         songContentTextView.topAnchor.constraint(equalTo: songNameTextView.bottomAnchor, constant: 8).isActive = true
         songContentTextView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         songContentTextView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        
-        print(songNameTextView.bounds)
-        print(songContentTextView.bounds)
     }
 
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
+            textView.text = nil
+            textView.textColor = UIColor.black
+        }
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Placeholder"
+            textView.textColor = UIColor.lightGray
+        }
+    }
+    
     /*
     // MARK: - Navigation
 

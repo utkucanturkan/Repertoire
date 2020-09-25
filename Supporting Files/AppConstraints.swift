@@ -14,6 +14,8 @@ struct AppConstraints {
     static let storyboardName = "Main"
     static let welcomeViewControllerStoryboardId = "WelcomeViewController"
     static let homeViewControllerStoryboardId = "HomeViewController"
+    static let songTableViewControllerStoryboardId = "SongTableViewController"
+    static let songViewControllerStoryboardId = "SongViewController"
     
     // Userdefault Keys
     static let userSessionKey = "applicationUserSession"
@@ -36,4 +38,8 @@ struct AppConstraints {
     static let songTableName = "songs"
     static let bookTableName = "books"
     static let bookSongTableName = "bookSong"
+    
+    // Textview Placeholder
+    static let songNameTextViewPlaceholder = "Enter a song name"
+    static let songContentTextViewPlaceholder = "Enter a song content"
 }
