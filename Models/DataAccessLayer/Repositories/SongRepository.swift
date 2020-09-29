@@ -53,23 +53,23 @@ struct SongRepository: RepositoryProtocol {
         return table.filter(id == entity!.id!).delete()
     }
     
-    func getAll(_ bookIdentifier: Int64? = nil) throws -> [Song]  {
+    func getAll(_ groupIdentifier: Int64? = nil) throws -> [Song]  {
         var result = [Song]()
         
         guard let database = SQLiteDataAccessLayer.shared.db else {
             throw DataAccessError.Datastore_Connection_Error
         }
         
-        let bookSongTable = Table(AppConstraints.bookSongTableName)
+        let bookSongTable = Table(AppConstraints.SongGroupSongTableName)
         let songFK = Expression<Int64>("songId")
         let songIndex = Expression<Int64>("songIndex")
-        let bookFK = Expression<Int64>("bookId")
+        let groupFK = Expression<Int64>("bookId")
 
         var query = table.join(bookSongTable, on: table[id] == bookSongTable[songFK])
-            .select(table[id], name, songIndex, bookFK)
+            .select(table[id], name, songIndex, groupFK)
         
-        if let bookIdentifier = bookIdentifier {
-            query = query.filter(bookFK == bookIdentifier)
+        if let groupIdentifier = groupIdentifier {
+            query = query.filter(groupFK == groupIdentifier)
         }
         	
         for row in try database.prepare(query.order(songIndex.asc)) {

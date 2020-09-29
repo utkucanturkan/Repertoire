@@ -8,10 +8,11 @@
 
 import Foundation
 
-struct Book {
+struct SongGroup {
     var localId: Int64
     var globalId: String?
     var name: String
     var createdDate: Date = Date()
     var songCount: Int = 0
+    var type: SongGroupType = .book
 }

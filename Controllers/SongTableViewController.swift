@@ -15,7 +15,7 @@ enum songTableViewMode {
 
 class SongTableViewController: UITableViewController {
     
-    var book: Book?
+    var songGroup: SongGroup?
     
     var mode: songTableViewMode = .list
     
@@ -43,18 +43,20 @@ class SongTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setTitle()
-        
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search a song"
-        definesPresentationContext = true
-        
+        initializeSearchController()
         setNavigationBarButtonItems()
         getSongs()
     }
     
     private func setTitle() {
-        self.title = (book != nil && mode == .list) ? "\(book!.name) Songs" : "All Songs"
+        self.title = (songGroup != nil && mode == .list) ? "\(songGroup!.name) Songs" : "All Songs"
+    }
+    
+    private func initializeSearchController() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search a song"
+        definesPresentationContext = true
     }
     
     // MARK: Navigation Bar Button Items
@@ -81,9 +83,9 @@ class SongTableViewController: UITableViewController {
     
     @objc func addNewSongBarButtonTapped() {
         let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
-        if let book = book {
+        if let book = songGroup {
             if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
-                stvc.book = book
+                stvc.songGroup = book
                 stvc.mode = .add
                 self.navigationController?.pushViewController(stvc, animated: true)
             }
@@ -96,7 +98,7 @@ class SongTableViewController: UITableViewController {
     }
     
     private func getSongs() {
-        let bookIdentifier = mode == .add ? nil : book?.localId
+        let bookIdentifier = mode == .add ? nil : songGroup?.localId
         if ApplicationUserSession.session!.islocal {
             do {
                 songs = try songRepository.getAll(bookIdentifier)

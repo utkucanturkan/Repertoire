@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct BookEntity: BaseEntity {
+struct SongGroupEntity: BaseEntity {
     
     // Primary-key
     var id: Int64?
@@ -19,4 +19,10 @@ struct BookEntity: BaseEntity {
     // Fields
     var name: String
     var status: Bool = true
+    var type: SongGroupType = .book
+}
+
+enum SongGroupType: String {
+    case book = "book"
+    case category = "category"
 }

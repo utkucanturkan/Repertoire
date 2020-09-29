@@ -9,26 +9,28 @@
 import Foundation
 import SQLite
 
-struct BookRepository: RepositoryProtocol {
-    var entity: BookEntity?
+struct SongGroupRepository: RepositoryProtocol {
+    var entity: SongGroupEntity?
     
-    typealias entityType = BookEntity
+    typealias entityType = SongGroupEntity
     
     // Expressions
     let name = Expression<String>("name")
     let userFK = Expression<Int64>("userId")
+    let type = Expression<String>("type")
     
     // References
     let users = Table(AppConstraints.userTableName)
     
     var tableName: String {
-        return AppConstraints.bookTableName
+        return AppConstraints.songGroupTableName
     }
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
             t.column(id, primaryKey: .autoincrement)
             t.column(name)
+            t.column(type)
             t.column(created, defaultValue: Date())
             t.column(updated)
             t.column(status, defaultValue: true)
@@ -41,7 +43,7 @@ struct BookRepository: RepositoryProtocol {
         
         // TODO: check whether the new model name is already existed or not
         
-        return table.insert(name <- entity!.name, userFK <- entity!.userId, status <- entity!.status)
+        return table.insert(name <- entity!.name, userFK <- entity!.userId, type <- entity!.type.rawValue, status <- entity!.status)
     }
 
     var updateExpression: Update {
@@ -56,17 +58,17 @@ struct BookRepository: RepositoryProtocol {
     }
     
     
-    func getAllBy(userIdentifier userId: Int64) throws -> [Book] {
-        var result = [Book]()
+    func getAllBy(userIdentifier userId: Int64, with groupType: SongGroupType) throws -> [SongGroup] {
+        var result = [SongGroup]()
                 
         guard let database = SQLiteDataAccessLayer.shared.db else { throw DataAccessError.Datastore_Connection_Error }
         
-        let bookSongRepository = BookSongRepository()
+        let bookSongRepository = SongGroupSongRepository()
         
-        for row in try database.prepare(table.filter(userFK == userId).filter(status == true).order(created))
+        for row in try database.prepare(table.filter(userFK == userId).filter(type == groupType.rawValue).filter(status == true).order(created))
         {
             let songCount = try? bookSongRepository.getTotalSongCount(by: row[id])
-            result.append(Book(localId: row[id], name: row[name], createdDate: row[created], songCount: songCount ?? 0))
+            result.append(SongGroup(localId: row[id], name: row[name], createdDate: row[created], songCount: songCount ?? 0, type: SongGroupType(rawValue: row[type])!))
         }
         
         return result

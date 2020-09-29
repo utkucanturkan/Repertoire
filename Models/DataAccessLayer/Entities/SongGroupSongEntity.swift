@@ -8,13 +8,12 @@
 
 import Foundation
 
-struct BookSongEntity: BaseEntity {
-    
+struct SongGroupSongEntity: BaseEntity {
     // Primary-key
     var id: Int64?
     
     // References
-    var bookId: Int64
+    var groupId: Int64
     var songId: Int64
     var songIndex: Int64
 }

@@ -36,8 +36,8 @@ struct AppConstraints {
     static let databasePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
     static let userTableName = "users"
     static let songTableName = "songs"
-    static let bookTableName = "books"
-    static let bookSongTableName = "bookSong"
+    static let songGroupTableName = "songGroup"
+    static let SongGroupSongTableName = "songGroupSong"
     
     // Textview Placeholder
     static let songNameTextViewPlaceholder = "Enter a song name"

@@ -25,7 +25,7 @@ struct SQLiteDataAccessLayer {
     }
     
     func initializeDatabase() {
-        let repositories: [InitializableRepository] = [UserRepository(), BookRepository(), SongRepository(), BookSongRepository()]
+        let repositories: [InitializableRepository] = [UserRepository(), SongGroupRepository(), SongRepository(), SongGroupSongRepository()]
         do {
             for initializableRepository in repositories {
                try initializableRepository.createTable()

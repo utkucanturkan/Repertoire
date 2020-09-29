@@ -9,37 +9,37 @@
 import Foundation
 import SQLite
 
-struct BookSongRepository: RepositoryProtocol {
-    typealias entityType = BookSongEntity
+struct SongGroupSongRepository: RepositoryProtocol {
+    typealias entityType = SongGroupSongEntity
     
-    var entity: BookSongEntity?
+    var entity: SongGroupSongEntity?
     
     // Expressions
-    let bookFK = Expression<Int64>("bookId")
+    let groupFK = Expression<Int64>("bookId")
     let songFK = Expression<Int64>("songId")
     let songIndex = Expression<Int64>("songIndex")
     
     // References
-    let books = Table(AppConstraints.bookTableName)
+    let songGroups = Table(AppConstraints.songGroupTableName)
     let songs = Table(AppConstraints.songTableName)
     
     var tableName: String {
-        return AppConstraints.bookSongTableName
+        return AppConstraints.SongGroupSongTableName
     }
     
     var createTableExpression: String {
         return table.create(ifNotExists: true) { t in
             t.column(id, primaryKey: .autoincrement)
-            t.column(bookFK)
+            t.column(groupFK)
             t.column(songFK)
             t.column(songIndex)
-            t.foreignKey(bookFK, references: books, id, delete: .cascade)
+            t.foreignKey(groupFK, references: songGroups, id, delete: .cascade)
             t.foreignKey(songFK, references: songs, id, delete: .cascade)
         }
     }
     
     var insertExpression: Insert {
-        return table.insert(bookFK <- entity!.bookId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
+        return table.insert(groupFK <- entity!.groupId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
     }
             
     var deleteExpression: Delete {
@@ -47,11 +47,11 @@ struct BookSongRepository: RepositoryProtocol {
     }
     
     var updateExpression: Update {
-        return table.filter(id == entity!.id!).update(bookFK <- entity!.bookId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
+        return table.filter(id == entity!.id!).update(groupFK <- entity!.groupId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
     }
     
     func getTotalSongCount(by bookIdentifier: Int64) throws -> Int {
         guard let database = SQLiteDataAccessLayer.shared.db else { throw DataAccessError.Datastore_Connection_Error }
-        return try database.scalar(table.filter(bookFK == bookIdentifier).count)
+        return try database.scalar(table.filter(groupFK == bookIdentifier).count)
     }    
 }
