@@ -275,7 +275,6 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="name" destination="8zH-OU-Cgx" id="rvr-8D-xS5"/>
-                                    <segue destination="Flb-dX-R2d" kind="show" identifier="viewSongSegue" id="BGh-Ms-xAF"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -284,38 +283,16 @@
                             <outlet property="delegate" destination="ews-0q-y2T" id="yHZ-ME-CWI"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="oA5-eh-EmY">
-                        <barButtonItem key="rightBarButtonItem" title="Item" id="N1J-oe-UYC">
-                            <connections>
-                                <segue destination="4qt-3D-FUf" kind="show" id="k9a-Lo-FSB"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="oA5-eh-EmY"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f5w-mK-SqG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2207" y="-133"/>
         </scene>
-        <!--Song View Controller-->
-        <scene sceneID="ka1-Px-VUJ">
-            <objects>
-                <viewController storyboardIdentifier="SongViewController" id="Flb-dX-R2d" customClass="SongViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ZSo-9o-0th">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="A1j-6f-FYb"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="hKQ-kk-HFu"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="T6v-xU-aoD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3093" y="-133"/>
-        </scene>
-        <!--Table View Controller-->
+        <!--Song Detail Table View Controller-->
         <scene sceneID="XPU-Tk-7iq">
             <objects>
-                <tableViewController id="4qt-3D-FUf" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="SongDetailTableViewController" id="4qt-3D-FUf" customClass="SongDetailTableViewController" customModule="Repertoire" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Osa-0h-043">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -444,7 +421,7 @@ Kaybetmekten korkarım</string>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NiP-yS-utN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3093" y="526"/>
+            <point key="canvasLocation" x="3080" y="-133"/>
         </scene>
         <!--Book-->
         <scene sceneID="9v0-LN-5sx">

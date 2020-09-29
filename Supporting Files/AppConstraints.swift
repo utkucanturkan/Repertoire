@@ -15,7 +15,7 @@ struct AppConstraints {
     static let welcomeViewControllerStoryboardId = "WelcomeViewController"
     static let homeViewControllerStoryboardId = "HomeViewController"
     static let songTableViewControllerStoryboardId = "SongTableViewController"
-    static let songViewControllerStoryboardId = "SongViewController"
+    static let songDetailTableViewControllerStoryboardId = "SongDetailTableViewController"
     
     // Userdefault Keys
     static let userSessionKey = "applicationUserSession"

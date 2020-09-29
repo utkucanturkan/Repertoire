@@ -14,7 +14,7 @@ enum songViewControllerMode {
     case add
 }
 
-class SongViewController: UIViewController, UITextViewDelegate {
+class OLDSongViewController: UIViewController, UITextViewDelegate {
 
     var mode: songViewControllerMode = .view {
         didSet {

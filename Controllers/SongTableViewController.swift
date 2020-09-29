@@ -46,6 +46,7 @@ class SongTableViewController: UITableViewController {
         initializeSearchController()
         setNavigationBarButtonItems()
         getSongs()
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     private func setTitle() {
@@ -90,8 +91,8 @@ class SongTableViewController: UITableViewController {
                 self.navigationController?.pushViewController(stvc, animated: true)
             }
         } else {
-            if let svc = storyboard.instantiateViewController(identifier: AppConstraints.songViewControllerStoryboardId) as? SongViewController {
-                svc.mode = .add
+            if let svc = storyboard.instantiateViewController(identifier: AppConstraints.songDetailTableViewControllerStoryboardId) as? SongDetailTableViewController {
+                //svc.mode = .add
                 self.navigationController?.pushViewController(svc, animated: true)
             }
         }
@@ -192,7 +193,7 @@ class SongTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier {
         case AppConstraints.addSongViewControllerIdentifier:
-            if let svc = segue.destination as? SongViewController {
+            if let svc = segue.destination as? OLDSongViewController {
                 svc.mode = .add
             }
         default:

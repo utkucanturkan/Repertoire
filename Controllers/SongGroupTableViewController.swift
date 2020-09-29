@@ -54,6 +54,7 @@ class SongGroupTableViewController: UITableViewController {
         initializeSegmentedController()
         initializeSearchController()
         getSongGroupsOfCurrentUser()
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     private func initializeSegmentedController() {
