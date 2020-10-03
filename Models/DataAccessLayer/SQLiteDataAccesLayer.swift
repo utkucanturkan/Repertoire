@@ -14,6 +14,11 @@ struct SQLiteDataAccessLayer {
     
     private let dbPath = "\(AppConstraints.databasePath)/db.sqlite3"
     
+    let repositories: [InitializableRepository] = [UserRepository(),
+                                                   SongGroupRepository(),
+                                                   SongRepository(),
+                                                   SongGroupSongRepository()]
+        
     let db: Connection?
     
     private init() {
@@ -24,16 +29,26 @@ struct SQLiteDataAccessLayer {
         }
     }
     
-    func initializeDatabase() {
-        let repositories: [InitializableRepository] = [UserRepository(), SongGroupRepository(), SongRepository(), SongGroupSongRepository()]
+    func initializeDatabase(with dataSeeder: DataSeederProtocol?) {
         do {
             for initializableRepository in repositories {
                try initializableRepository.createTable()
             }
+            
+            if let seeder = dataSeeder {
+                seeder.seed()
+            }
+            
         } catch {
             print(error.localizedDescription)
         }
     }
+    
+    func initializeDatabase() {
+        initializeDatabase(with: nil)
+    }
+    
+    
     
     func createTable(expression: String) throws {
         guard let database = db else {

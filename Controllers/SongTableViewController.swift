@@ -8,87 +8,91 @@
 
 import UIKit
 
-enum songTableViewMode {
-    case list
-    case add
-}
-
 class SongTableViewController: UITableViewController {
+    private let SEARCHBAR_PLACEHOLDER = "Search a song"
     
-    var songGroup: SongGroup?
+    private var TABLEVIEW_EMPTY_VIEW: (title: String, message: String) {
+        return ("You have not any song", "A new song can be added by + button on the right corner")
+    }
+        
+    var tableMode: SongTableProtocol! = SongTableDefault()
     
-    var mode: songTableViewMode = .list
+    private var groupIdentifier: Int64? {
+        return !(tableMode is AddedableTable) ? nil : self.tableMode.songGroup?.localId
+    }
     
     private let searchController = UISearchController(searchResultsController: nil)
+    
+    private lazy var backBarButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    
+    private lazy var addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewSongBarButtonTapped))
     
     private var songRepository = SongRepository()
     
     private var songs = [Song]() {
         didSet {
-            setNavigationBarButtonItems()
             navigationItem.searchController = !songs.isEmpty ? searchController : nil
+            navigationItem.rightBarButtonItem = !songs.isEmpty && tableMode is DeletableTable ? self.editButtonItem : nil
         }
     }
     
     private var filteredSong = [Song]()
     
-    private var isSearchBarEmpty: Bool {
-        return searchController.searchBar.text?.isEmpty ?? true
-    }
+    private var isSearchBarEmpty: Bool { return searchController.searchBar.text?.isEmpty ?? true }
     
-    private var isfiltering: Bool {
-        return searchController.isActive && !isSearchBarEmpty
-    }
+    private var isfiltering: Bool { return searchController.isActive && !isSearchBarEmpty }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setTitle()
         initializeSearchController()
-        setNavigationBarButtonItems()
+        setLeftBarButtonItems()
         getSongs()
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     private func setTitle() {
-        self.title = (songGroup != nil && mode == .list) ? "\(songGroup!.name) Songs" : "All Songs"
+        self.title = tableMode.songGroup != nil ? "\(tableMode.songGroup?.name ?? "") Songs" : "All Songs"
     }
     
     private func initializeSearchController() {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search a song"
+        searchController.searchBar.placeholder = SEARCHBAR_PLACEHOLDER
         definesPresentationContext = true
-    }
-    
-    // MARK: Navigation Bar Button Items
-    private func setNavigationBarButtonItems() {
-        setRightBarButtonItems()
-        setLeftBarButtonItems()
     }
     
     private func setLeftBarButtonItems() {
         self.navigationItem.leftItemsSupplementBackButton = true
-        if mode != .add {
-            let addNewSongBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewSongBarButtonTapped))
-            self.navigationItem.leftBarButtonItem = addNewSongBarButton
-        }
-    }
-    
-    private func setRightBarButtonItems() {
-        if !songs.isEmpty {
-            if self.navigationItem.rightBarButtonItems != nil {
-                self.navigationItem.rightBarButtonItems!.append(self.editButtonItem)
-            }
-        }
+        self.navigationItem.backBarButtonItem = backBarButton
+        self.navigationItem.leftBarButtonItem = (tableMode is AddedableTable) ? addBarButton : nil
     }
     
     @objc func addNewSongBarButtonTapped() {
         let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
-        if let book = songGroup {
-            if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
-                stvc.songGroup = book
-                stvc.mode = .add
-                self.navigationController?.pushViewController(stvc, animated: true)
+        if let songGroup = tableMode.songGroup {
+            
+            if songGroup.type == .book {
+                let alert = UIAlertController(title: "New Songs", message: "What do you want to add?", preferredStyle: .actionSheet)
+                
+                alert.addAction(UIAlertAction(title: "Category", style: .default, handler: { (UIAlertAction) in
+                  
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Song", style: .default, handler: { (UIAlertAction) in
+                    if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
+                        stvc.tableMode = SongTableOfNewSongForGroup(songGroup: songGroup)
+                        self.navigationController?.pushViewController(stvc, animated: true)
+                    }
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                
+                self.present(alert, animated: true)
+            } else if songGroup.type == .category {
+                if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
+                    stvc.tableMode = SongsTableOfGroup(songGroup: songGroup)
+                    self.navigationController?.pushViewController(stvc, animated: true)
+                }
             }
         } else {
             if let svc = storyboard.instantiateViewController(identifier: AppConstraints.songDetailTableViewControllerStoryboardId) as? SongDetailTableViewController {
@@ -99,10 +103,9 @@ class SongTableViewController: UITableViewController {
     }
     
     private func getSongs() {
-        let bookIdentifier = mode == .add ? nil : songGroup?.localId
         if ApplicationUserSession.session!.islocal {
             do {
-                songs = try songRepository.getAll(bookIdentifier)
+                songs = try songRepository.getAll(by: groupIdentifier)
             } catch {
                 print(error.localizedDescription)
             }
@@ -111,10 +114,9 @@ class SongTableViewController: UITableViewController {
         }
     }
     
-    private func deleteSong(_ songViewModel: Song) {
+    private func deleteSong(_ song: Song) {
         do {
-            // let song = Song(id: songViewModel.id, userId: ApplicationUserSession.session!.localId, name: songViewModel.name, content: songViewModel, mediaUrl: <#T##String#>, status: <#T##Bool#>)
-            // try songRepository.delete(element: song)
+            try songRepository.delete(element: SongEntity.create(from: song))
             if !ApplicationUserSession.session!.islocal {
                 
                 // TODO: delete song from firebase cloud store
@@ -139,8 +141,9 @@ class SongTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let totalDataCount = isfiltering ? filteredSong.count : songs.count
-        if totalDataCount == 0 {
-            tableView.setEmptyView(title: "You have not any song", message: isfiltering ? "" : "A new song can be added by + button on the right corner")
+        if totalDataCount == .zero {
+            tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
+                                   message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
         } else {
             tableView.restore()
         }
@@ -157,7 +160,7 @@ class SongTableViewController: UITableViewController {
     
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        return tableMode is DeletableTable
     }
     
     // Override to support editing the table view.
@@ -181,12 +184,15 @@ class SongTableViewController: UITableViewController {
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
+        print("FROM \(fromIndexPath)")
+        print("TO \(to)")
+        
     }
 
     // Override to support conditional rearranging of the table view.
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-        return !isfiltering
+        return tableMode is MovableTable
     }
 
     // MARK: - Navigation

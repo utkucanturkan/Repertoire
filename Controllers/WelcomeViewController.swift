@@ -42,7 +42,7 @@ class WelcomeViewController: UIViewController, GIDSignInDelegate, LoginButtonDel
     
     private func initializeLocalDatabase() {
         if ApplicationUserSession.session == nil {
-            SQLiteDataAccessLayer.shared.initializeDatabase()
+            SQLiteDataAccessLayer.shared.initializeDatabase(with: DatabaseSeedManager())
         }
     }
     

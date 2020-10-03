@@ -16,7 +16,7 @@ struct SongRepository: RepositoryProtocol {
         
     // Expressions
     let name = Expression<String>("name")
-    let content = Expression<String>("content")
+    let content = Expression<String?>("content")
     let mediaUrl = Expression<String?>("mediaUrl")
     let userFK = Expression<Int64>("userId")
     
@@ -42,7 +42,7 @@ struct SongRepository: RepositoryProtocol {
     }
     
     var insertExpression: Insert {
-        return table.insert(name <- entity!.name, content <- entity!.content, mediaUrl <- entity!.mediaUrl, status <- entity!.status)
+        return table.insert(name <- entity!.name, userFK <- entity!.userId, content <- entity!.content, mediaUrl <- entity!.mediaUrl, status <- entity!.status)
     }
     
     var updateExpression: Update {
@@ -53,27 +53,29 @@ struct SongRepository: RepositoryProtocol {
         return table.filter(id == entity!.id!).delete()
     }
     
-    func getAll(_ groupIdentifier: Int64? = nil) throws -> [Song]  {
+    func getAll(by groupIdentifier: Int64? = nil) throws -> [Song]  {
+        let songGroupTable = Table(AppConstraints.SongGroupSongTableName)
+        let songFK = Expression<Int64>("songId")
+        let songIndex = Expression<Int64>("songIndex")
+        let groupFK = Expression<Int64>("bookId")
+        
         var result = [Song]()
         
         guard let database = SQLiteDataAccessLayer.shared.db else {
             throw DataAccessError.Datastore_Connection_Error
         }
-        
-        let bookSongTable = Table(AppConstraints.SongGroupSongTableName)
-        let songFK = Expression<Int64>("songId")
-        let songIndex = Expression<Int64>("songIndex")
-        let groupFK = Expression<Int64>("bookId")
 
-        var query = table.join(bookSongTable, on: table[id] == bookSongTable[songFK])
-            .select(table[id], name, songIndex, groupFK)
+        var query = table.order(name.asc)
         
         if let groupIdentifier = groupIdentifier {
-            query = query.filter(groupFK == groupIdentifier)
+            query = table.join(songGroupTable, on: table[id] == songGroupTable[songFK])
+                .select(table[id], name, songIndex, groupFK)
+                .filter(groupFK == groupIdentifier)
+                .order(songIndex.asc)
         }
-        	
-        for row in try database.prepare(query.order(songIndex.asc)) {
-            result.append(Song(id: row[id], name: row[name], index: row[songIndex]))
+        
+        for row in try database.prepare(query) {
+            result.append(Song(id: row[id], name: row[name], index: groupIdentifier == nil ? 0 : row[songIndex]))
         }
         
         return result

@@ -19,7 +19,12 @@ struct SongGroupEntity: BaseEntity {
     // Fields
     var name: String
     var status: Bool = true
-    var type: SongGroupType = .book
+    var type: SongGroupType
+    
+    static func create(from: SongGroup) -> SongGroupEntity {
+        return SongGroupEntity(id: from.localId, userId: 0, name: from.name, type: from.type)
+    }
+    
 }
 
 enum SongGroupType: String {

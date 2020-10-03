@@ -11,9 +11,7 @@ import SQLite
 import Firebase
 
 class SongGroupTableViewController: UITableViewController {
-    
-    // Constants
-    private let INITIAL_SELECTED_SEGMENT_INDEX = 0
+    private let INITIAL_SELECTED_SEGMENT_INDEX: Int = .zero
     private let SONG_GROUP_TYPES: [SongGroupModelType] = [BookSongGroup(), CategorySongGroup()]
     
     private var songGroups = [SongGroup]() {
@@ -90,14 +88,14 @@ class SongGroupTableViewController: UITableViewController {
             guard let newSongGroupName = alert.textFields?.first?.text else { return }
             if newSongGroupName.isValid {
                 if let newSongGroupDatabaseIds = self.addNewSongGroup(with: newSongGroupName) {
-                    let newSongGroup = SongGroup(localId: newSongGroupDatabaseIds.localId, globalId: newSongGroupDatabaseIds.globalId, name: newSongGroupName)
+                    let newSongGroup = SongGroup(localId: newSongGroupDatabaseIds.localId, globalId: newSongGroupDatabaseIds.globalId, name: newSongGroupName, type: currentSongGroup.type)
                     self.songGroups.append(newSongGroup)
                     self.tableView.reloadData()
                     
-                    // TODO: change with storyboardIdentifier
-                    let bdvc = SongTableViewController()
-                    bdvc.songGroup = newSongGroup
-                    self.navigationController?.pushViewController(bdvc, animated: true)
+                    if let stvc = storyboard?.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
+                        stvc.tableMode = SongsTableOfGroup(songGroup: newSongGroup)
+                        self.navigationController?.pushViewController(stvc, animated: true)
+                    }
                 }
             }
         })
@@ -106,7 +104,7 @@ class SongGroupTableViewController: UITableViewController {
     }
     
     private func addNewSongGroup(with name: String) -> (localId: Int64, globalId: String?)? {
-        var newSongGroup: (localId: Int64, globalId: String?) = (0, nil)
+        var newSongGroup: (localId: Int64, globalId: String?) = (.zero, nil)
         do {
             let newlyAddedSongGroup = SongGroupEntity(
                 userId: ApplicationUserSession.session!.localId,
@@ -135,12 +133,7 @@ class SongGroupTableViewController: UITableViewController {
     
     private func deleteSongGroup(_ songGroup: SongGroup) {
         do {
-            let deletedSongGroup = SongGroupEntity(
-                id: songGroup.localId,
-                userId: ApplicationUserSession.session!.localId,
-                name: songGroup.name)
-            
-            try songGroupRepository.delete(element: deletedSongGroup)
+            try songGroupRepository.delete(element: SongGroupEntity.create(from: songGroup))
             if !ApplicationUserSession.session!.islocal {
                 
                 // TODO: delete book from firebase cloud store
@@ -173,7 +166,7 @@ class SongGroupTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let totalSongGroupCount = isfiltering ? filteredSongGroups.count : songGroups.count
-        if totalSongGroupCount == 0 {
+        if totalSongGroupCount == .zero {
             tableView.setEmptyView(
                 title: currentSongGroup.emptyTableview.title,
                 message: isfiltering ? "" : currentSongGroup.emptyTableview.message)
@@ -215,8 +208,8 @@ class SongGroupTableViewController: UITableViewController {
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
-            if let bdvc = segue.destination as? SongTableViewController, let bcv = sender as? SongGroupTableViewCell {
-                bdvc.songGroup = bcv.songGroup
+            if let stvc = segue.destination as? SongTableViewController, let bcv = sender as? SongGroupTableViewCell {
+                stvc.tableMode = SongsTableOfGroup(songGroup: bcv.songGroup)
             }
         }
     }

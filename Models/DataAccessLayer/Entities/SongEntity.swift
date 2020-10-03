@@ -18,7 +18,14 @@ struct SongEntity: BaseEntity {
     
     // Fields
     var name: String
-    var content: String
-    var mediaUrl: String
+    var content: String?
+    var mediaUrl: String?
     var status: Bool = true
+    
+    
+    
+    static func create(from: Song) -> SongEntity {
+        return SongEntity(id: from.id, userId: 0, name: from.name)
+    }
+    
 }

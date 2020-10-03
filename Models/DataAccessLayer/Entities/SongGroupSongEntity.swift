@@ -16,4 +16,6 @@ struct SongGroupSongEntity: BaseEntity {
     var groupId: Int64
     var songId: Int64
     var songIndex: Int64
+    
+
 }

@@ -14,5 +14,5 @@ struct SongGroup {
     var name: String
     var createdDate: Date = Date()
     var songCount: Int = 0
-    var type: SongGroupType = .book
+    var type: SongGroupType
 }

@@ -28,7 +28,6 @@ class SongGroupTableViewCell: UITableViewCell {
     @IBOutlet weak var createdDate: UILabel!
     
     private func updateCell() {
-        print(songTypeImageIdentifier)
         if let songGroup = songGroup {
             name?.text = songGroup.name
             songCount?.text = songGroup.songCount == 0 ? "No Song" : "\(songGroup.songCount) song(s)"
