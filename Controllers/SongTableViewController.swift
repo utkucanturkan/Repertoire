@@ -41,7 +41,7 @@ class SongTableViewController: UITableViewController {
     
     private var filteredSong = [Song]()
     
-    private var songSections = [String: Int]()
+    private var songSections = [String: [Song]]()
     
     private var songSectionTitles = [String]()
     
@@ -112,10 +112,12 @@ class SongTableViewController: UITableViewController {
     private func setTableSectionTitles() {
         songs.forEach { song in
             let firstLetterOfSongName = song.name.prefix(1).uppercased()
-            if let letter = songSections[firstLetterOfSongName] {
-                songSections[firstLetterOfSongName] = letter + 1
+            if var songs = songSections[firstLetterOfSongName] {
+                songs.append(song)
+                songSections[firstLetterOfSongName] = songs
+                
             } else {
-                songSections[firstLetterOfSongName] = 1
+                songSections[firstLetterOfSongName] = [song]
             }
         }
         songSectionTitles = songSections.keys.sorted(by: <)
@@ -167,14 +169,22 @@ class SongTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let totalDataCount = isfiltering ? filteredSong.count : songSections[songSectionTitles[section]]!
-        if totalDataCount == .zero {
+        var totalSongCount = 0
+        
+        if isfiltering {
+            totalSongCount = filteredSong.count
+        } else {
+            totalSongCount = songSections[songSectionTitles[section]]?.count ?? 0
+        }
+
+        if totalSongCount == .zero {
             tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
                                    message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
         } else {
             tableView.restore()
         }
-        return totalDataCount
+        
+        return totalSongCount
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -183,10 +193,7 @@ class SongTableViewController: UITableViewController {
         if isfiltering {
             cell.song = filteredSong[indexPath.row]
         } else {
-            let s = songs.filter { s -> Bool in
-                return s.name.hasPrefix(songSectionTitles[indexPath.section])
-            }
-            cell.song = s[indexPath.row]
+            cell.song = songSections[songSectionTitles[indexPath.section]]![indexPath.row]
         }
 
         return cell
