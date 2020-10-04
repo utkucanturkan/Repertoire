@@ -18,7 +18,7 @@ class SongTableViewController: UITableViewController {
     var tableMode: SongTableProtocol! = SongTableDefault()
     
     private var groupIdentifier: Int64? {
-        return !(tableMode is AddedableTable) ? nil : self.tableMode.songGroup?.localId
+        return self.tableMode.songGroup?.localId
     }
     
     private let searchController = UISearchController(searchResultsController: nil)
@@ -33,10 +33,17 @@ class SongTableViewController: UITableViewController {
         didSet {
             navigationItem.searchController = !songs.isEmpty ? searchController : nil
             navigationItem.rightBarButtonItem = !songs.isEmpty && tableMode is DeletableTable ? self.editButtonItem : nil
+            if !songs.isEmpty {
+                setTableSectionTitles()
+            }
         }
     }
     
     private var filteredSong = [Song]()
+    
+    private var songSections = [String: Int]()
+    
+    private var songSectionTitles = [String]()
     
     private var isSearchBarEmpty: Bool { return searchController.searchBar.text?.isEmpty ?? true }
     
@@ -102,6 +109,18 @@ class SongTableViewController: UITableViewController {
         }
     }
     
+    private func setTableSectionTitles() {
+        songs.forEach { song in
+            let firstLetterOfSongName = song.name.prefix(1).uppercased()
+            if let letter = songSections[firstLetterOfSongName] {
+                songSections[firstLetterOfSongName] = letter + 1
+            } else {
+                songSections[firstLetterOfSongName] = 1
+            }
+        }
+        songSectionTitles = songSections.keys.sorted(by: <)
+    }
+    
     private func getSongs() {
         if ApplicationUserSession.session!.islocal {
             do {
@@ -136,11 +155,19 @@ class SongTableViewController: UITableViewController {
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return songSectionTitles.count
     }
 
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return songSectionTitles[section]
+    }
+    
+    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        return songSectionTitles
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let totalDataCount = isfiltering ? filteredSong.count : songs.count
+        let totalDataCount = isfiltering ? filteredSong.count : songSections[songSectionTitles[section]]!
         if totalDataCount == .zero {
             tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
                                    message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
@@ -153,7 +180,14 @@ class SongTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.songCellIdentifier, for: indexPath) as! SongTableViewCell
 
-        cell.song = isfiltering ? filteredSong[indexPath.row] : songs[indexPath.row]
+        if isfiltering {
+            cell.song = filteredSong[indexPath.row]
+        } else {
+            let s = songs.filter { s -> Bool in
+                return s.name.hasPrefix(songSectionTitles[indexPath.section])
+            }
+            cell.song = s[indexPath.row]
+        }
 
         return cell
     }
