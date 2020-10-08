@@ -8,22 +8,24 @@
 
 import Foundation
 
-protocol AddedableTable: SongTableProtocol { }
+protocol Addedable: TableProtocol { }
 
-protocol DeletableTable: SongTableProtocol { }
+protocol Deletable: TableProtocol { }
 
-protocol MovableTable: SongTableProtocol { }
+protocol Movable: TableProtocol { }
 
-protocol SongTableProtocol { var songGroup: SongGroup? { get set } }
+protocol Indexable: TableProtocol { }
 
-struct SongsTableOfGroup: AddedableTable, DeletableTable, MovableTable {
+protocol TableProtocol { var songGroup: SongGroup? { get set } }
+
+struct SongsOfGroupListingTable: Addedable, Deletable, Movable {
     var songGroup: SongGroup?
 }
 
-struct SongTableOfNewSongForGroup: SongTableProtocol {
+struct NewSongAdditionTable: TableProtocol {
     var songGroup: SongGroup?
 }
 
-struct SongTableDefault: AddedableTable, DeletableTable {
+struct AllSongsListingTable: Addedable, Deletable, Indexable {
     var songGroup: SongGroup?
 }

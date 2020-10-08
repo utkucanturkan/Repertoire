@@ -19,14 +19,13 @@ class DatabaseSeedManager: DataSeederProtocol {
     private func seedSongs() {
         for _ in 1...30 {            
             do {
-                _ = try songRepository.insert(element: SongEntity(userId: 1, name: "Song Name", content: "Contrary to popular belief, Lorem Ipsum is not simply random text. ", mediaUrl: "https://youtube.com")
+                let asciiValue: UInt8 = UInt8.random(in: 65...90)
+                let c = Character(UnicodeScalar(asciiValue))
+                _ = try songRepository.insert(element: SongEntity(userId: 1, name: "\(c) Song", content: "Contrary to popular belief, Lorem Ipsum is not simply random text. ", mediaUrl: "https://youtube.com")
                     )
             } catch {
-                print(error.localizedDescription)
+                print("[ERROR] - Seeding songs!")
             }
         }
-        
-        
-        //songs.forEach { _ = try? songRepository.insert(element: $0) }
     }
 }

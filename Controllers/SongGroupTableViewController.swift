@@ -17,7 +17,7 @@ class SongGroupTableViewController: UITableViewController {
     private var songGroups = [SongGroup]() {
         didSet {
             navigationItem.rightBarButtonItem = !songGroups.isEmpty ? self.editButtonItem : nil
-            navigationItem.searchController = !songGroups.isEmpty ? searchController : nil
+            //navigationItem.searchController = !songGroups.isEmpty ? searchController : nil
         }
     }
     
@@ -67,6 +67,7 @@ class SongGroupTableViewController: UITableViewController {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = currentSongGroup.searchBarPlaceholder
+        navigationItem.searchController = searchController
         definesPresentationContext = true
     }
     
@@ -93,7 +94,7 @@ class SongGroupTableViewController: UITableViewController {
                     self.tableView.reloadData()
                     
                     if let stvc = storyboard?.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
-                        stvc.tableMode = SongsTableOfGroup(songGroup: newSongGroup)
+                        stvc.table = SongsOfGroupListingTable(songGroup: newSongGroup)
                         self.navigationController?.pushViewController(stvc, animated: true)
                     }
                 }
@@ -190,15 +191,13 @@ class SongGroupTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let deletedSongGroup = isfiltering ? filteredSongGroups.remove(at: indexPath.row) : songGroups.remove(at: indexPath.row)
-            if isfiltering {
-                var itemIndex = 0
-                for item in songGroups {
-                    if item.localId == deletedSongGroup.localId {
-                        songGroups.remove(at: itemIndex)
-                    }
-                    itemIndex += 1
+            let deletedSongGroup = isfiltering ? filteredSongGroups.remove(at: indexPath.row) : songGroups[indexPath.row]
+            var itemIndex = 0
+            for item in songGroups {
+                if item.localId == deletedSongGroup.localId {
+                    songGroups.remove(at: itemIndex)
                 }
+                itemIndex += 1
             }
             deleteSongGroup(deletedSongGroup)
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -208,14 +207,14 @@ class SongGroupTableViewController: UITableViewController {
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == AppConstraints.bookDetailViewControllerSegueIdentifier {
-            if let stvc = segue.destination as? SongTableViewController, let bcv = sender as? SongGroupTableViewCell {
-                stvc.tableMode = SongsTableOfGroup(songGroup: bcv.songGroup)
+            if let stvc = segue.destination as? SongTableViewController, let sgtvc = sender as? SongGroupTableViewCell {
+                stvc.table = SongsOfGroupListingTable(songGroup: sgtvc.songGroup)
             }
         }
     }
 }
 
-extension SongGroupTableViewController: UISearchResultsUpdating, UISearchControllerDelegate {
+extension SongGroupTableViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterModelForSearchText(searchBar.text!)

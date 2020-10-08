@@ -12,13 +12,13 @@ class SongTableViewController: UITableViewController {
     private let SEARCHBAR_PLACEHOLDER = "Search a song"
     
     private var TABLEVIEW_EMPTY_VIEW: (title: String, message: String) {
-        return ("You have not any song", "A new song can be added by + button on the right corner")
+        return ("You have not any song", "A new song can be added by + button on the left corner")
     }
         
-    var tableMode: SongTableProtocol! = SongTableDefault()
+    var table: TableProtocol! = AllSongsListingTable()
     
     private var groupIdentifier: Int64? {
-        return self.tableMode.songGroup?.localId
+        return self.table.songGroup?.localId
     }
     
     private let searchController = UISearchController(searchResultsController: nil)
@@ -31,11 +31,8 @@ class SongTableViewController: UITableViewController {
     
     private var songs = [Song]() {
         didSet {
-            navigationItem.searchController = !songs.isEmpty ? searchController : nil
-            navigationItem.rightBarButtonItem = !songs.isEmpty && tableMode is DeletableTable ? self.editButtonItem : nil
-            if !songs.isEmpty {
-                setTableSectionTitles()
-            }
+            navigationItem.rightBarButtonItem = !songs.isEmpty && table is Deletable ? self.editButtonItem : nil
+            setTableSectionTitles()
         }
     }
     
@@ -58,25 +55,26 @@ class SongTableViewController: UITableViewController {
     }
     
     private func setTitle() {
-        self.title = tableMode.songGroup != nil ? "\(tableMode.songGroup?.name ?? "") Songs" : "All Songs"
+        self.title = table.songGroup != nil ? "\(table.songGroup?.name ?? "") Songs" : "All Songs"
     }
     
     private func initializeSearchController() {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = SEARCHBAR_PLACEHOLDER
+        navigationItem.searchController = searchController
         definesPresentationContext = true
     }
     
     private func setLeftBarButtonItems() {
         self.navigationItem.leftItemsSupplementBackButton = true
         self.navigationItem.backBarButtonItem = backBarButton
-        self.navigationItem.leftBarButtonItem = (tableMode is AddedableTable) ? addBarButton : nil
+        self.navigationItem.leftBarButtonItem = (table is Addedable) ? addBarButton : nil
     }
     
     @objc func addNewSongBarButtonTapped() {
         let storyboard = UIStoryboard(name: AppConstraints.storyboardName, bundle: nil)
-        if let songGroup = tableMode.songGroup {
+        if let songGroup = table.songGroup {
             
             if songGroup.type == .book {
                 let alert = UIAlertController(title: "New Songs", message: "What do you want to add?", preferredStyle: .actionSheet)
@@ -87,7 +85,7 @@ class SongTableViewController: UITableViewController {
                 
                 alert.addAction(UIAlertAction(title: "Song", style: .default, handler: { (UIAlertAction) in
                     if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
-                        stvc.tableMode = SongTableOfNewSongForGroup(songGroup: songGroup)
+                        stvc.table = NewSongAdditionTable(songGroup: songGroup)
                         self.navigationController?.pushViewController(stvc, animated: true)
                     }
                 }))
@@ -97,7 +95,7 @@ class SongTableViewController: UITableViewController {
                 self.present(alert, animated: true)
             } else if songGroup.type == .category {
                 if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
-                    stvc.tableMode = SongsTableOfGroup(songGroup: songGroup)
+                    stvc.table = NewSongAdditionTable(songGroup: songGroup)
                     self.navigationController?.pushViewController(stvc, animated: true)
                 }
             }
@@ -110,23 +108,146 @@ class SongTableViewController: UITableViewController {
     }
     
     private func setTableSectionTitles() {
-        songs.forEach { song in
-            let firstLetterOfSongName = song.name.prefix(1).uppercased()
-            if var songs = songSections[firstLetterOfSongName] {
-                songs.append(song)
-                songSections[firstLetterOfSongName] = songs
-                
-            } else {
-                songSections[firstLetterOfSongName] = [song]
+        songSections.removeAll()
+        songSectionTitles.removeAll()
+        if table is Indexable {
+            songs.forEach { song in
+                let firstLetterOfSongName = song.name.prefix(1).uppercased()
+                if var songs = songSections[firstLetterOfSongName] {
+                    songs.append(song)
+                    songSections[firstLetterOfSongName] = songs
+                } else {
+                    songSections[firstLetterOfSongName] = [song]
+                }
             }
+            songSectionTitles = songSections.keys.sorted(by: <)
         }
-        songSectionTitles = songSections.keys.sorted(by: <)
     }
     
+
+    
+    private func filterModelForSearchText(_ searchText: String) {
+        filteredSong = songs.filter { song in
+            return song.name.lowercased().contains(searchText.lowercased())
+        }
+        tableView.reloadData()
+    }
+    
+    // MARK: - Table view data source
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return isfiltering || !(table is Indexable) ? 1 : songSectionTitles.count
+    }
+
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return isfiltering || !(table is Indexable) ? nil : songSectionTitles.isEmpty ? nil : songSectionTitles[section]
+    }
+    
+    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        return isfiltering || !(table is Indexable) ? nil : songSectionTitles
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let totalSongCount = isfiltering ? filteredSong.count : table is Indexable ? songSectionTitles.isEmpty ? 0 : songSections[songSectionTitles[section]]?.count ?? 0 : songs.count
+
+        if totalSongCount == .zero {
+            tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
+                                   message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
+        } else {
+            tableView.restore()
+        }
+        
+        return totalSongCount
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.songCellIdentifier, for: indexPath) as! SongTableViewCell
+
+        if isfiltering {
+            cell.song = filteredSong[indexPath.row]
+        } else if table is Indexable {
+            if let songsInSection = songSections[songSectionTitles[indexPath.section]] {
+                cell.song = songsInSection[indexPath.row]
+            }
+        } else {
+            cell.song = songs[indexPath.row]
+        }
+
+        return cell
+    }
+    
+    // Override to support conditional editing of the table view.
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return table is Deletable
+    }
+    
+    // Override to support editing the table view.
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            
+            // get deleted element
+            let deletedSong = isfiltering ? filteredSong.remove(at: indexPath.row) : table is Indexable ? songSections[songSectionTitles[indexPath.section]]![indexPath.row] : songs[indexPath.row]
+            
+            // delete from model
+            var itemIndex = 0
+            for item in songs {
+                if item.id == deletedSong.id {
+                    songs.remove(at: itemIndex)
+                }
+                itemIndex += 1
+            }
+            
+            // Delete from view
+            if !isfiltering && table is Indexable && tableView.numberOfRows(inSection: indexPath.section) == 1 {
+                let indexSet = IndexSet(arrayLiteral: indexPath.section)
+                tableView.deleteSections(indexSet, with: .fade)
+            } else {
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
+            
+            if table is Indexable && tableView.numberOfSections == .zero {
+                tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
+                                       message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
+            }
+            
+            // Delete from remote data source
+            deleteSong(deletedSong)
+        }
+    }
+
+    
+    // Override to support rearranging the table view.
+    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+
+        print("FROM \(fromIndexPath)")
+        print("TO \(to)")
+        
+    }
+
+    // Override to support conditional rearranging of the table view.
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return table is Movable
+    }
+
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        switch segue.identifier {
+        case AppConstraints.addSongViewControllerIdentifier:
+            if let svc = segue.destination as? OLDSongViewController {
+                svc.mode = .add
+            }
+        default:
+            break
+        }
+    }
+}
+
+// MARK: Model CRUD Operations Extension
+extension SongTableViewController {
     private func getSongs() {
         if ApplicationUserSession.session!.islocal {
             do {
                 songs = try songRepository.getAll(by: groupIdentifier)
+                tableView.reloadData()
             } catch {
                 print(error.localizedDescription)
             }
@@ -145,106 +266,6 @@ class SongTableViewController: UITableViewController {
             }
         } catch {
             
-        }
-    }
-    
-    private func filterModelForSearchText(_ searchText: String) {
-        filteredSong = songs.filter { song in
-            return song.name.lowercased().contains(searchText.lowercased())
-        }
-        tableView.reloadData()
-    }
-    
-    // MARK: - Table view data source
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return songSectionTitles.count
-    }
-
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return songSectionTitles[section]
-    }
-    
-    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return songSectionTitles
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var totalSongCount = 0
-        
-        if isfiltering {
-            totalSongCount = filteredSong.count
-        } else {
-            totalSongCount = songSections[songSectionTitles[section]]?.count ?? 0
-        }
-
-        if totalSongCount == .zero {
-            tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
-                                   message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
-        } else {
-            tableView.restore()
-        }
-        
-        return totalSongCount
-    }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: AppConstraints.songCellIdentifier, for: indexPath) as! SongTableViewCell
-
-        if isfiltering {
-            cell.song = filteredSong[indexPath.row]
-        } else {
-            cell.song = songSections[songSectionTitles[indexPath.section]]![indexPath.row]
-        }
-
-        return cell
-    }
-    
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return tableMode is DeletableTable
-    }
-    
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let deletedSong = isfiltering ? filteredSong.remove(at: indexPath.row) : songs.remove(at: indexPath.row)
-            if isfiltering {
-                var itemIndex = 0
-                for item in songs {
-                    if item.id == deletedSong.id {
-                        songs.remove(at: itemIndex)
-                    }
-                    itemIndex += 1
-                }
-            }
-            deleteSong(deletedSong)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        }
-    }
-
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-        print("FROM \(fromIndexPath)")
-        print("TO \(to)")
-        
-    }
-
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return tableMode is MovableTable
-    }
-
-    // MARK: - Navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        switch segue.identifier {
-        case AppConstraints.addSongViewControllerIdentifier:
-            if let svc = segue.destination as? OLDSongViewController {
-                svc.mode = .add
-            }
-        default:
-            break
         }
     }
 }
