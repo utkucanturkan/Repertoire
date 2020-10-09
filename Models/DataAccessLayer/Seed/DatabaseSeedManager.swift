@@ -17,7 +17,7 @@ class DatabaseSeedManager: DataSeederProtocol {
     }
     
     private func seedSongs() {
-        for _ in 1...30 {            
+        for _ in 1...5 {            
             do {
                 let asciiValue: UInt8 = UInt8.random(in: 65...90)
                 let c = Character(UnicodeScalar(asciiValue))

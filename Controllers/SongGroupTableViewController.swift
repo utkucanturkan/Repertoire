@@ -17,7 +17,6 @@ class SongGroupTableViewController: UITableViewController {
     private var songGroups = [SongGroup]() {
         didSet {
             navigationItem.rightBarButtonItem = !songGroups.isEmpty ? self.editButtonItem : nil
-            //navigationItem.searchController = !songGroups.isEmpty ? searchController : nil
         }
     }
     

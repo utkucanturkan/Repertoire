@@ -17,9 +17,7 @@ class SongTableViewController: UITableViewController {
         
     var table: TableProtocol! = AllSongsListingTable()
     
-    private var groupIdentifier: Int64? {
-        return self.table.songGroup?.localId
-    }
+    private var groupIdentifier: Int64? { return self.table.songGroup?.localId }
     
     private let searchController = UISearchController(searchResultsController: nil)
     
@@ -41,6 +39,15 @@ class SongTableViewController: UITableViewController {
     private var songSections = [String: [Song]]()
     
     private var songSectionTitles = [String]()
+    
+    private var totalSectionCount: Int {
+        if songSectionTitles.isEmpty {
+            tableView?.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title, message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
+        } else {
+            tableView?.restore()
+        }
+        return songSectionTitles.count
+    }
     
     private var isSearchBarEmpty: Bool { return searchController.searchBar.text?.isEmpty ?? true }
     
@@ -123,9 +130,7 @@ class SongTableViewController: UITableViewController {
             songSectionTitles = songSections.keys.sorted(by: <)
         }
     }
-    
 
-    
     private func filterModelForSearchText(_ searchText: String) {
         filteredSong = songs.filter { song in
             return song.name.lowercased().contains(searchText.lowercased())
@@ -135,7 +140,7 @@ class SongTableViewController: UITableViewController {
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return isfiltering || !(table is Indexable) ? 1 : songSectionTitles.count
+        return isfiltering || !(table is Indexable) ? 1 : totalSectionCount
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -196,17 +201,12 @@ class SongTableViewController: UITableViewController {
                 itemIndex += 1
             }
             
-            // Delete from view
+            // delete from view
             if !isfiltering && table is Indexable && tableView.numberOfRows(inSection: indexPath.section) == 1 {
                 let indexSet = IndexSet(arrayLiteral: indexPath.section)
                 tableView.deleteSections(indexSet, with: .fade)
             } else {
                 tableView.deleteRows(at: [indexPath], with: .fade)
-            }
-            
-            if table is Indexable && tableView.numberOfSections == .zero {
-                tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
-                                       message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
             }
             
             // Delete from remote data source
