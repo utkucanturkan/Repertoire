@@ -36,20 +36,15 @@ struct SongGroupRepository: RepositoryProtocol {
             t.column(status, defaultValue: true)
             t.column(userFK)
             t.foreignKey(userFK, references: users, id, delete: .cascade)
+            t.unique(userFK, name, type)
         }
     }
     
     var insertExpression: Insert {
-        
-        // TODO: check whether the new model name is already existed or not
-        
         return table.insert(name <- entity!.name, userFK <- entity!.userId, type <- entity!.type.rawValue, status <- entity!.status)
     }
 
     var updateExpression: Update {
-        
-        // TODO: check whether the updating model name is already existed or not
-        
         return table.filter(id == entity!.id!).update(name <- entity!.name, status <- entity!.status)
     }
  

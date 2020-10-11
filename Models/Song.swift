@@ -11,7 +11,7 @@ import Foundation
 struct Song {
     var id: Int64
     var name: String
-    var index: Int64
+    var index: Int64?
     var content: String?
     var categories: [String]?
 }

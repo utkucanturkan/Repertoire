@@ -81,30 +81,32 @@ struct SQLiteDataAccessLayer {
         }
     }
     
-    func update(expression: Update) throws {
+    func update(expression: Update) throws -> Int {
         guard let database = db else {
             throw DataAccessError.Datastore_Connection_Error
         }
         
         do {
-            let tmp = try database.run(expression)
-            guard tmp > 0 else {
+            let rowId = try database.run(expression)
+            guard rowId > 0 else {
                 throw DataAccessError.Update_Error
             }
+            return rowId
         } catch _ {
             throw DataAccessError.Update_Error
         }
     }
     
-    func delete(expression: Delete) throws {
+    func delete(expression: Delete) throws -> Int {
         guard let database = db else {
             throw DataAccessError.Datastore_Connection_Error
         }
         do {
-            let tmp = try database.run(expression)
-            guard tmp > 0 else {
+            let rowId = try database.run(expression)
+            guard rowId > 0 else {
                 throw DataAccessError.Delete_Error
             }
+            return rowId
         } catch _ {
             throw DataAccessError.Delete_Error
         }

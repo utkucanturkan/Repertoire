@@ -35,19 +35,26 @@ struct SongGroupSongRepository: RepositoryProtocol {
             t.column(songIndex)
             t.foreignKey(groupFK, references: songGroups, id, delete: .cascade)
             t.foreignKey(songFK, references: songs, id, delete: .cascade)
+            t.unique(groupFK, songFK)
         }
     }
     
     var insertExpression: Insert {
-        return table.insert(groupFK <- entity!.groupId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
+        return table.insert(groupFK     <- entity!.groupId,
+                            songFK      <- entity!.songId,
+                            songIndex   <- entity!.songIndex)
     }
             
     var deleteExpression: Delete {
-        return table.filter(id == entity!.id!).delete()
+        return table.filter(id == entity!.id!)
+                    .delete()
     }
     
     var updateExpression: Update {
-        return table.filter(id == entity!.id!).update(groupFK <- entity!.groupId, songFK <- entity!.songId, songIndex <- entity!.songIndex)
+        return table.filter(id == entity!.id!)
+                    .update(groupFK     <- entity!.groupId,
+                            songFK      <- entity!.songId,
+                            songIndex   <- entity!.songIndex)
     }
     
     func getTotalSongCount(by bookIdentifier: Int64) throws -> Int {

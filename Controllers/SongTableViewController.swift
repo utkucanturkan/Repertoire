@@ -24,9 +24,7 @@ class SongTableViewController: UITableViewController {
     private lazy var backBarButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     
     private lazy var addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewSongBarButtonTapped))
-    
-    private var songRepository = SongRepository()
-    
+        
     private var songs = [Song]() {
         didSet {
             navigationItem.rightBarButtonItem = !songs.isEmpty && table is Deletable ? self.editButtonItem : nil
@@ -245,7 +243,8 @@ extension SongTableViewController {
     private func getSongs() {
         if ApplicationUserSession.session!.islocal {
             do {
-                songs = try songRepository.getAll(by: groupIdentifier)
+                songs = try table.getSongs()
+                //songs = try songRepository.getAll(by: groupIdentifier)
                 tableView.reloadData()
             } catch {
                 print(error.localizedDescription)
