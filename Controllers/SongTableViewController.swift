@@ -155,8 +155,7 @@ class SongTableViewController: UITableViewController {
         let totalSongCount = isfiltering ? filteredSong.count : table is Indexable ? songSectionTitles.isEmpty ? 0 : songSections[songSectionTitles[section]]?.count ?? 0 : songs.count
 
         if totalSongCount == .zero {
-            tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title,
-                                   message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
+            tableView.setEmptyView(title: TABLEVIEW_EMPTY_VIEW.title, message: isfiltering ? "" : TABLEVIEW_EMPTY_VIEW.message)
         } else {
             tableView.restore()
         }
