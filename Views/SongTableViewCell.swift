@@ -26,11 +26,18 @@ class SongTableViewCell: UITableViewCell {
        accessoryType = selected ? .checkmark : .none
     }
     
-    @IBOutlet weak var name: UILabel!
+    @IBOutlet weak var lblSongName: UILabel!
+    
+    @IBOutlet weak var lblSongCategories: UILabel!
     
     private func updateCell() {
         if let songModel = song {
-            name?.text = songModel.name
+            lblSongName?.text = songModel.name
+            if let categories = songModel.categories {
+                lblSongCategories.text = categories.printItems(with: ",")
+            } else {
+                lblSongCategories.text = "No Category"
+            }
         }
     }
 }

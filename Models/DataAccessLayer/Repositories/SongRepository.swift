@@ -84,10 +84,16 @@ struct SongRepository: RepositoryProtocol {
                          .order(songIndex.asc)
         }
         
+        let songGroupSongRepository = SongGroupSongRepository()
+        
         try database.prepare(query).forEach { row in
-            songs.append(Song(id: row[id],
-                               name: row[name],
-                               index: groupIdentifier == nil ? 0 : row[songIndex]))
+            
+            var song = Song(id: row[id], name: row[name], index: groupIdentifier == nil ? 0 : row[songIndex])
+            
+            let categories = try songGroupSongRepository.getCategoriesOfSong(by: song.id)
+            song.categories = categories
+            
+            songs.append(song)
         }
         
         return songs
@@ -105,11 +111,15 @@ struct SongRepository: RepositoryProtocol {
         let identifiers = try songGroupSongRepository.getSongIds(by: groupIdentifier)
         
         let query = table.filter(!identifiers.contains(id)).order(name.asc)
-        
+                
         try database.prepare(query).forEach { row in
-            result.append(Song(id: row[id],
-                               name: row[name],
-                               categories: nil))
+            
+            var song = Song(id: row[id], name: row[name])
+            
+            let categories = try songGroupSongRepository.getCategoriesOfSong(by: song.id)
+            song.categories = categories
+            
+            result.append(song)
         }
         
         return result

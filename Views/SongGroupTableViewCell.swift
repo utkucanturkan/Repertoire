@@ -36,12 +36,3 @@ class SongGroupTableViewCell: UITableViewCell {
         }
     }
 }
-
-
-extension Date {
-    func format(as format: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = format
-        return dateFormatter.string(from: self)
-    }
-}

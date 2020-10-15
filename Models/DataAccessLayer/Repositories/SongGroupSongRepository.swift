@@ -78,4 +78,26 @@ struct SongGroupSongRepository: RepositoryProtocol {
         
         return ids
     }
+    
+    func getCategoriesOfSong(by songIdentifier: Int64) throws -> [String]? {
+        guard let database = SQLiteDataAccessLayer.shared.db else {
+            throw DataAccessError.Datastore_Connection_Error
+        }
+        
+        var categories = [String]()
+        
+        let songGroupTable = Table(AppConstraints.songGroupTableName)
+        let type = Expression<String>("type")
+        let name = Expression<String>("name")
+        
+        let query = table.filter(songFK == songIdentifier)
+                         .join(songGroupTable, on: table[groupFK] == songGroupTable[id])
+                         .filter(songGroupTable[type] == SongGroupType.category.rawValue)
+        
+        try database.prepare(query).forEach { row in
+            categories.append(row[name])
+        }
+        
+        return categories.isEmpty ? nil : categories
+    }
 }

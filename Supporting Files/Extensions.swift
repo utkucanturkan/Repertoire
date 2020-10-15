@@ -9,6 +9,24 @@
 import Foundation
 import UIKit
 
+extension Array {
+    func printItems(with deliminator: Character) -> String {
+        var stringRepresentation = ""
+        self.forEach { element in
+            stringRepresentation += "\(element)\(deliminator.description) "
+        }
+        return stringRepresentation.trimmingCharacters(in: .whitespacesAndNewlines).trimmingCharacters(in: .punctuationCharacters)
+    }
+}
+
+extension Date {
+    func format(as format: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
+    }
+}
+
 extension UserDefaults {
     func setEncodable<Object>(object item: Object, with key:String) throws where Object: Encodable {
         do {
