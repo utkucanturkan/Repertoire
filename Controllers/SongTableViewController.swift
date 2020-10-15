@@ -88,7 +88,7 @@ class SongTableViewController: UITableViewController {
                   
                 }))
                 
-                alert.addAction(UIAlertAction(title: "Song", style: .default, handler: { (UIAlertAction) in
+                alert.addAction(UIAlertAction(title: "Song", style: .default, handler: { _ in
                     if let stvc = storyboard.instantiateViewController(identifier: AppConstraints.songTableViewControllerStoryboardId) as? SongTableViewController {
                         stvc.table = NewSongAdditionTable(songGroup: songGroup)
                         self.navigationController?.pushViewController(stvc, animated: true)

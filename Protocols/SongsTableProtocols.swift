@@ -12,6 +12,8 @@ protocol TableProtocol {
     var songGroup: SongGroup? { get set }
     
     var songRepository: SongRepository { get set }
+    
+    func getSongs() throws -> [Song]
 }
 
 protocol Addedable: TableProtocol { }

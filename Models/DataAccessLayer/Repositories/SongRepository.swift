@@ -104,7 +104,7 @@ struct SongRepository: RepositoryProtocol {
         
         let identifiers = try songGroupSongRepository.getSongIds(by: groupIdentifier)
         
-        let query = table.filter(!identifiers.contains(id))
+        let query = table.filter(!identifiers.contains(id)).order(name.asc)
         
         try database.prepare(query).forEach { row in
             result.append(Song(id: row[id],

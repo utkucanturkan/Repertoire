@@ -33,7 +33,7 @@ class DatabaseSeedManager: DataSeederProtocol {
     }
     
     private func seedSongs() {
-        for _ in 1...15 {
+        for _ in 1...150 {
             do {
                 let songId = try songRepository.insert(element: SongEntity(userId: defaultUserId, name: "\(randomChar) Song", content: "Contrary to popular belief, Lorem Ipsum is not simply random text. ", mediaUrl: "https://youtube.com"))
                 insertedSongIds.append(songId)
