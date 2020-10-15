@@ -20,6 +20,7 @@ protocol Addedable: TableProtocol { }
 protocol Deletable: TableProtocol { }
 protocol Movable: TableProtocol { }
 protocol Indexable: TableProtocol { }
+protocol MultiSelectable { }
     
 extension TableProtocol {
     func getSongs() throws -> [Song] {
@@ -45,7 +46,7 @@ struct SongsOfGroupListingTable: Addedable, Deletable, Movable {
     }
 }
 
-struct NewSongAdditionTable: TableProtocol {
+struct NewSongAdditionTable: TableProtocol, MultiSelectable {
     var songGroup: SongGroup?
     var songRepository = SongRepository()
     

@@ -16,6 +16,16 @@ class SongTableViewCell: UITableViewCell {
         }
     }
     
+    override func awakeFromNib() {
+       super.awakeFromNib()
+       selectionStyle = .none
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+       super.setSelected(selected, animated: animated)
+       accessoryType = selected ? .checkmark : .none
+    }
+    
     @IBOutlet weak var name: UILabel!
     
     private func updateCell() {

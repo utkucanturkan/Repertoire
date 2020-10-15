@@ -52,7 +52,8 @@ class SongTableViewController: UITableViewController {
     private var isfiltering: Bool { return searchController.isActive && !isSearchBarEmpty }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+        super.viewDidLoad()	
+        tableView.allowsMultipleSelection = table is MultiSelectable
         setTitle()
         initializeSearchController()
         setLeftBarButtonItems()
