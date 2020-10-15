@@ -8,47 +8,54 @@
 
 import Foundation
 
-protocol Addedable: TableProtocol { }
-
-protocol Deletable: TableProtocol { }
-
-protocol Movable: TableProtocol { }
-
-protocol Indexable: TableProtocol { }
-
 protocol TableProtocol {
     var songGroup: SongGroup? { get set }
-
-    func getSongs() throws -> [Song]
+    
+    var songRepository: SongRepository { get set }
 }
+
+protocol Addedable: TableProtocol { }
+protocol Deletable: TableProtocol { }
+protocol Movable: TableProtocol { }
+protocol Indexable: TableProtocol { }
     
 extension TableProtocol {
-    var songRepository: SongRepository {
-        return SongRepository()
+    func getSongs() throws -> [Song] {
+        return try songRepository.getAll(by: songGroup?.localId)
+    }
+    
+    mutating func delete(song: Song) throws {
+        let entity = SongEntity.create(from: song)
+        try songRepository.delete(element: entity)
     }
 }
 
 struct SongsOfGroupListingTable: Addedable, Deletable, Movable {
-    func getSongs() throws -> [Song] {
-        
-    }
-    
-
     var songGroup: SongGroup?
+    var songRepository = SongRepository()
+    
+    func delete(song: Song) throws {
+        var songGroupSongRepository = SongGroupSongRepository()
+        if let group = songGroup {
+            let entity = SongGroupSongEntity.create(from: group, and: song)
+            try songGroupSongRepository.delete(element: entity)
+        }
+    }
 }
 
 struct NewSongAdditionTable: TableProtocol {
-    func getSongs() throws -> [Song] {
-        
-    }
-    
     var songGroup: SongGroup?
+    var songRepository = SongRepository()
+    
+    func getSongs() throws -> [Song] {
+        if let group = songGroup {
+            return try songRepository.getAllDistinct(of: group.localId)
+        }
+        return try songRepository.getAll(by: nil)
+    }
 }
 
 struct AllSongsListingTable: Addedable, Deletable, Indexable {
-    func getSongs() throws -> [Song] {
-        return try songRepository.getAll(by: 1)
-    }
-    
     var songGroup: SongGroup?
+    var songRepository = SongRepository()
 }

@@ -69,7 +69,7 @@ struct SongRepository: RepositoryProtocol {
         let songIndex = Expression<Int64>("songIndex")
         let groupFK = Expression<Int64>("bookId")
         
-        var result = [Song]()
+        var songs = [Song]()
         
         guard let database = SQLiteDataAccessLayer.shared.db else {
             throw DataAccessError.Datastore_Connection_Error
@@ -85,20 +85,24 @@ struct SongRepository: RepositoryProtocol {
         }
         
         try database.prepare(query).forEach { row in
-            result.append(Song(id: row[id],
+            songs.append(Song(id: row[id],
                                name: row[name],
                                index: groupIdentifier == nil ? 0 : row[songIndex]))
         }
         
-        return result
+        return songs
     }
     
-    func getAllDistinct(from identifiers: Int64...) throws -> [Song] {
+    func getAllDistinct(of groupIdentifier: Int64) throws -> [Song] {
         var result = [Song]()
         
         guard let database = SQLiteDataAccessLayer.shared.db else {
             throw DataAccessError.Datastore_Connection_Error
         }
+        
+        let songGroupSongRepository = SongGroupSongRepository()
+        
+        let identifiers = try songGroupSongRepository.getSongIds(by: groupIdentifier)
         
         let query = table.filter(!identifiers.contains(id))
         

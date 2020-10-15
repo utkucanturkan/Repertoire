@@ -191,13 +191,12 @@ class SongTableViewController: UITableViewController {
             
             // delete from model
             var itemIndex = 0
-            for item in songs {
-                if item.id == deletedSong.id {
+            songs.forEach { s in
+                if s.id == deletedSong.id {
                     songs.remove(at: itemIndex)
                 }
                 itemIndex += 1
             }
-            
             // delete from view
             if !isfiltering && table is Indexable && tableView.numberOfRows(inSection: indexPath.section) == 1 {
                 let indexSet = IndexSet(arrayLiteral: indexPath.section)
@@ -244,23 +243,24 @@ extension SongTableViewController {
         if ApplicationUserSession.session!.islocal {
             do {
                 songs = try table.getSongs()
-                //songs = try songRepository.getAll(by: groupIdentifier)
                 tableView.reloadData()
             } catch {
                 print(error.localizedDescription)
             }
         } else {
+            //
             // TODO: get from firebase cloud store
+            //
         }
     }
     
     private func deleteSong(_ song: Song) {
         do {
-            try songRepository.delete(element: SongEntity.create(from: song))
+            try table.delete(song: song)
             if !ApplicationUserSession.session!.islocal {
-                
+                //
                 // TODO: delete song from firebase cloud store
-                
+                //
             }
         } catch {
             

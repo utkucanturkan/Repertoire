@@ -46,7 +46,8 @@ struct SongGroupSongRepository: RepositoryProtocol {
     }
             
     var deleteExpression: Delete {
-        return table.filter(id == entity!.id!)
+        return table.filter(groupFK == entity!.groupId)
+                    .filter(songFK == entity!.songId)
                     .delete()
     }
     
@@ -60,5 +61,21 @@ struct SongGroupSongRepository: RepositoryProtocol {
     func getTotalSongCount(by bookIdentifier: Int64) throws -> Int {
         guard let database = SQLiteDataAccessLayer.shared.db else { throw DataAccessError.Datastore_Connection_Error }
         return try database.scalar(table.filter(groupFK == bookIdentifier).count)
-    }    
+    }
+    
+    func getSongIds(by groupIdentifier: Int64) throws -> [Int64] {
+        guard let database = SQLiteDataAccessLayer.shared.db else {
+            throw DataAccessError.Datastore_Connection_Error
+        }
+        
+        let query = table.filter(groupFK == groupIdentifier)
+        
+        var ids = [Int64]()
+        
+        try database.prepare(query).forEach { row in
+            ids.append(row[songFK])
+        }
+        
+        return ids
+    }
 }

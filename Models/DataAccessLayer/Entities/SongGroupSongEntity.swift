@@ -18,4 +18,8 @@ struct SongGroupSongEntity: BaseEntity {
     var songIndex: Int64
     
 
+    static func create(from: SongGroup, and: Song) -> SongGroupSongEntity {
+        return SongGroupSongEntity(groupId: from.localId, songId: and.id, songIndex: and.index ?? 0)
+    }
+    
 }

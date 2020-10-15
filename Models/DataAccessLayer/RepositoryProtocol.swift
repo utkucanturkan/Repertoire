@@ -52,7 +52,7 @@ extension RepositoryProtocol {
         guard let _ = element.id else {
             throw DataAccessError.Nil_In_Data
         }
-        try SQLiteDataAccessLayer.shared.delete(expression: deleteExpression)
+        _ = try SQLiteDataAccessLayer.shared.delete(expression: deleteExpression)
     }
     
     mutating func update(element: entityType) throws {
@@ -60,6 +60,6 @@ extension RepositoryProtocol {
         guard let _ = element.id else {
             throw DataAccessError.Nil_In_Data
         }
-        try SQLiteDataAccessLayer.shared.update(expression: updateExpression)
+        _ = try SQLiteDataAccessLayer.shared.update(expression: updateExpression)
     }
 }
